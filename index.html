@@ -42,7 +42,29 @@
             --status-piloto: #4a90e2;
         }
 
-        body { font-family: 'Montserrat', sans-serif; font-weight: 400; background-color: var(--bg-page); color: var(--text-main); margin: 0; padding: 20px; }
+        /* Se quitaron los márgenes para que el banner toque los bordes */
+        body { font-family: 'Montserrat', sans-serif; font-weight: 400; background-color: var(--bg-page); color: var(--text-main); margin: 0; padding: 0; }
+
+        /* ESTILOS DEL BANNER SUPERIOR */
+        .top-header {
+            width: 100%;
+            height: 140px; /* Altura fija para que se vea como un banner elegante */
+            overflow: hidden;
+            background-color: var(--bold-azul); /* Color de fondo por si la imagen tarda en cargar */
+        }
+
+        .header-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Hace que la imagen llene el espacio sin deformarse */
+            object-position: center; /* Centra el estallido radial */
+            display: block;
+        }
+
+        /* Contenedor principal para mantener los márgenes del resto de la página */
+        .main-container {
+            padding: 25px 30px;
+        }
 
         .page-header { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; }
         .page-header img { height: 40px; }
@@ -61,7 +83,6 @@
 
         .timeline-wrapper { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 0; overflow-x: auto; overflow-y: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
         
-        /* LA SOLUCIÓN: Un lienzo súper ancho (9000px). Así las cajas de pocos días son anchas físicamente en tu pantalla y el texto siempre cabe sin falsificar fechas. */
         .timeline-scroll-area { min-width: 9000px; position: relative; display: flex; flex-direction: column;}
 
         .quarters-header { display: flex; border-bottom: 2px solid #fff; background: var(--bold-coral); color: white; border-radius: 8px 8px 0 0;}
@@ -95,7 +116,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
             box-sizing: border-box; 
             gap: 8px;
-            /* Cero bugeos, cero text-overflows problemáticos, estático y confiable */
             overflow: hidden;
             transition: filter 0.2s ease;
         }
@@ -118,49 +138,54 @@
 </head>
 <body>
 
-    <div class="page-header">
-        <img src="https://bold-process-automation.github.io/assets-project-graphic-design/bold-logo-palabra-azul.png" alt="Logo Bold">
-        <h1>Roadmap Process Automation Team</h1>
-    </div>
+    <header class="top-header">
+        <img src="header.png" alt="Patrón de cabezal Bold" class="header-image">
+    </header>
 
-    <div class="controls-header">
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('Automation IA')">Automation IA</button>
-            <button class="tab" onclick="switchTab('Appian')">Appian</button>
+    <div class="main-container">
+        
+        <div class="page-header">
+            <img src="https://bold-process-automation.github.io/assets-project-graphic-design/bold-logo-palabra-azul.png" alt="Logo Bold">
+            <h1>Roadmap Process Automation Team</h1>
         </div>
-    </div>
 
-    <div class="legend-container">
-        <span class="legend-title">Convenciones de Áreas:</span>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-risk)"></span>Risk</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-financial)"></span>Financial</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-sales)"></span>Sales</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-human-talent)"></span>Human Talent</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-legal)"></span>Legal</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-cs)"></span>CS</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-logistica)"></span>Logística</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-hubs)"></span>Hubs</div>
-        <div class="legend-item"><span class="legend-color" style="background: var(--area-marketing)"></span>Marketing</div>
-    </div>
-
-    <div class="timeline-wrapper">
-        <div class="timeline-scroll-area">
-            
-            <div class="quarters-header" id="quarters-header"></div>
-            <div class="months-header" id="months-header"></div>
-            <div class="weeks-header" id="weeks-header"></div>
-            <div class="grid-lines" id="grid-lines"></div>
-            
-            <div class="projects-area" id="projects-container"></div>
-
-            <div id="today-marker" class="today-line" style="display: none;">
-                <div class="today-label">Hoy</div>
+        <div class="controls-header">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('Automation IA')">Automation IA</button>
+                <button class="tab" onclick="switchTab('Appian')">Appian</button>
             </div>
-
         </div>
-    </div>
 
-    <script>
+        <div class="legend-container">
+            <span class="legend-title">Convenciones de Áreas:</span>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-risk)"></span>Risk</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-financial)"></span>Financial</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-sales)"></span>Sales</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-human-talent)"></span>Human Talent</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-legal)"></span>Legal</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-cs)"></span>CS</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-logistica)"></span>Logística</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-hubs)"></span>Hubs</div>
+            <div class="legend-item"><span class="legend-color" style="background: var(--area-marketing)"></span>Marketing</div>
+        </div>
+
+        <div class="timeline-wrapper">
+            <div class="timeline-scroll-area">
+                
+                <div class="quarters-header" id="quarters-header"></div>
+                <div class="months-header" id="months-header"></div>
+                <div class="weeks-header" id="weeks-header"></div>
+                <div class="grid-lines" id="grid-lines"></div>
+                
+                <div class="projects-area" id="projects-container"></div>
+
+                <div id="today-marker" class="today-line" style="display: none;">
+                    <div class="today-label">Hoy</div>
+                </div>
+
+            </div>
+        </div>
+    </div> <script>
         const sheetApiUrl = 'https://script.google.com/macros/s/AKfycbynd7JOqdCceaBVf_AEBaoxhSCNg-5MNZvVb2_xQHI8hJVfvR0dd8IIPgd4A4GCMWWk/exec'; 
         
         const wStart = new Date(2026, 0, 1, 0, 0, 0);
@@ -256,7 +281,6 @@
                 return p.Equipo.toString().toLowerCase().trim() === currentTab;
             });
 
-            // Orden Cascading Estricto: 1. Fecha de Inicio, 2. Área, 3. Fecha Fin
             filteredData.sort((a, b) => {
                 const dateA = parseDateSafe(a['Fecha de Inicio'])?.getTime() || 0;
                 const dateB = parseDateSafe(b['Fecha de Inicio'])?.getTime() || 0;
@@ -280,7 +304,6 @@
                 
                 if (leftPos === null || rightPos === null) return;
                 
-                // Ancho estrictamente matemático basado en las fechas.
                 let width = rightPos - leftPos;
                 
                 if (rightPos > 0 && leftPos < 100) {
@@ -318,9 +341,7 @@
                     
                     container.appendChild(bar);
 
-                    // Algoritmo Tetris: Encuentra la primera fila disponible basándose en las FECHAS.
                     let currentRow = 0;
-                    // Dejamos un ínfimo margen del 0.1% (unos 9 pixeles) para que no se toquen visualmente
                     while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.1)) {
                         currentRow++;
                     }
@@ -332,7 +353,6 @@
             
             container.style.height = `${rowEndPositions.length * 42 + 60}px`;
 
-            // Auto-scroll centrado en "Hoy" de manera exacta
             setTimeout(() => {
                 const wrapper = document.querySelector('.timeline-wrapper');
                 const scrollArea = document.querySelector('.timeline-scroll-area');
@@ -346,7 +366,6 @@
                 
                 const todayPosition = (daysPassed / 365) * scrollWidth;
                 
-                // Centra la línea de HOY exactamente en la mitad de la pantalla de tu monitor
                 const targetLeft = Math.max(0, todayPosition - (wrapperWidth / 2)); 
 
                 wrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
