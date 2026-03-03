@@ -54,7 +54,9 @@
         .tab { font-family: 'Montserrat', sans-serif; font-weight: 600; padding: 10px 25px; cursor: pointer; border-radius: 6px; background: var(--bold-gris-claro); color: var(--bold-azul); border: none; transition: all 0.2s ease; }
         .tab.active { background: var(--bold-coral); color: #fff; box-shadow: 0 4px 6px rgba(255, 40, 71, 0.2); }
 
-        /* NUEVO FILTRO POR ÁREAS */
+        /* CONTENEDOR DERECHO PARA AGRUPAR FILTRO Y TOGGLE */
+        .right-controls { display: flex; align-items: center; gap: 15px; }
+
         .filter-container { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--bold-azul); }
         .filter-container select {
             padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background-color: #fff;
@@ -117,7 +119,6 @@
         .project-bar[data-area="legal"] { color: var(--bold-azul); }
 
         .project-title { white-space: nowrap; }
-
         .badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
         .badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600;}
         .project-bar[data-area="legal"] .badge { background: rgba(0,0,0,0.1); }
@@ -156,29 +157,31 @@
                 <button class="tab" onclick="switchTab('Automation IA')">Automation IA</button>
             </div>
             
-            <div class="filter-container">
-                <label for="areaFilter">Área:</label>
-                <select id="areaFilter" onchange="filterByArea()">
-                    <option value="all">Todas las áreas</option>
-                    <option value="risk">Risk</option>
-                    <option value="financial">Financial</option>
-                    <option value="sales">Sales</option>
-                    <option value="human-talent">Human Talent</option>
-                    <option value="legal">Legal</option>
-                    <option value="cs">CS</option>
-                    <option value="logistica">Logística</option>
-                    <option value="hubs">Hubs</option>
-                    <option value="marketing">Marketing</option>
-                </select>
-            </div>
+            <div class="right-controls">
+                <div class="filter-container">
+                    <label for="areaFilter">Área:</label>
+                    <select id="areaFilter" onchange="filterByArea()">
+                        <option value="all">Todas las áreas</option>
+                        <option value="risk">Risk</option>
+                        <option value="financial">Financial</option>
+                        <option value="sales">Sales</option>
+                        <option value="human-talent">Human Talent</option>
+                        <option value="legal">Legal</option>
+                        <option value="cs">CS</option>
+                        <option value="logistica">Logística</option>
+                        <option value="hubs">Hubs</option>
+                        <option value="marketing">Marketing</option>
+                    </select>
+                </div>
 
-            <div class="view-toggle" id="toggleContainer">
-                <span id="label-semanas">Semanas</span>
-                <label class="switch">
-                    <input type="checkbox" id="viewToggle" onchange="toggleViewMode()">
-                    <span class="slider"></span>
-                </label>
-                <span id="label-meses">Meses</span>
+                <div class="view-toggle" id="toggleContainer">
+                    <span id="label-semanas">Semanas</span>
+                    <label class="switch">
+                        <input type="checkbox" id="viewToggle" onchange="toggleViewMode()">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="label-meses">Meses</span>
+                </div>
             </div>
         </div>
 
@@ -219,7 +222,7 @@
         const totalDays = (wEnd - wStart) / (1000 * 60 * 60 * 24);
 
         let currentTab = 'appian'; 
-        let currentArea = 'all'; // Nueva variable para controlar el filtro
+        let currentArea = 'all'; 
         let data = []; 
 
         function renderCalendarHeaders() {
@@ -331,11 +334,9 @@
             }, 300);
         }
 
-        // Función que se activa al cambiar el Dropdown de Áreas
         function filterByArea() {
             currentArea = document.getElementById('areaFilter').value;
             renderProjects();
-            // Centramos de nuevo a hoy para mantener el contexto
             setTimeout(scrollToToday, 100); 
         }
 
@@ -347,14 +348,10 @@
             if (!data || data.length === 0) return;
 
             let filteredData = data.filter(p => {
-                // Filtro 1: Pestaña (Appian / Automation IA)
                 const tabCategory = p['Frente de trabajo'] || p['Frente'] || p['Plataforma'] || p['Equipo'];
                 const matchesTab = tabCategory && tabCategory.toString().toLowerCase().trim() === currentTab;
-
-                // Filtro 2: Área (Dropdown)
                 const areaValue = p['Área'] ? normalizeText(p['Área']) : 'default';
                 const matchesArea = currentArea === 'all' || areaValue === currentArea;
-
                 return matchesTab && matchesArea;
             });
 
@@ -408,15 +405,10 @@
                     const projName = project['Nombre del proyecto'] || 'Sin nombre';
 
                     let iconHtml = '';
-                    if (statusKey === 'dev') {
-                        iconHtml = `<img src="dev.png" class="status-icon" title="Estado: Dev">`;
-                    } else if (statusKey === 'test') {
-                        iconHtml = `<img src="test.png" class="status-icon" title="Estado: Test">`;
-                    } else if (statusKey === 'prod') {
-                        iconHtml = `<img src="prod.png" class="status-icon" title="Estado: Prod">`;
-                    } else if (statusKey === 'piloto') {
-                        iconHtml = `<img src="piloto1.png" class="status-icon piloto-icon" title="Estado: Piloto">`;
-                    }
+                    if (statusKey === 'dev') iconHtml = `<img src="dev.png" class="status-icon" title="Estado: Dev">`;
+                    else if (statusKey === 'test') iconHtml = `<img src="test.png" class="status-icon" title="Estado: Test">`;
+                    else if (statusKey === 'prod') iconHtml = `<img src="prod.png" class="status-icon" title="Estado: Prod">`;
+                    else if (statusKey === 'piloto') iconHtml = `<img src="piloto1.png" class="status-icon piloto-icon" title="Estado: Piloto">`;
 
                     bar.innerHTML = `
                         <span class="project-title" title="${projName}">${projName}</span>
@@ -449,11 +441,6 @@
             currentTab = team.toLowerCase().trim(); 
             document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // Opcional: Reiniciar el filtro de área al cambiar de pestaña
-            // document.getElementById('areaFilter').value = 'all';
-            // currentArea = 'all';
-
             renderProjects();
         }
 
