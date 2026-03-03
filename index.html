@@ -11,6 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* ==========================================================================
+           VARIABLES Y PALETA DE COLOR
+           ========================================================================== */
         :root {
             --bold-coral: #FF2847;
             --bold-azul: #121E6C;
@@ -36,6 +39,9 @@
             --area-default: linear-gradient(135deg, #d00030 0%, #00308f 100%); 
         }
 
+        /* ==========================================================================
+           ESTILOS GENERALES Y LAYOUT
+           ========================================================================== */
         body { font-family: 'Montserrat', sans-serif; font-weight: 400; background-color: var(--bg-page); color: var(--text-main); margin: 0; padding: 0; }
 
         .top-header { width: 100%; height: 160px; background-image: url('header-blue.png'); background-size: cover; background-position: center; display: flex; align-items: center; padding: 0 30px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
@@ -44,13 +50,14 @@
         .page-header h1 { font-weight: 700; font-size: 38px; margin: 0; color: #FFFFFF; text-shadow: 0 2px 6px rgba(0,0,0,0.5); }
 
         .main-container { padding: 25px 30px; }
-
         .controls-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
         
+        /* BOTONES DE PESTAÑAS */
         .tabs { display: flex; gap: 10px; }
         .tab { font-family: 'Montserrat', sans-serif; font-weight: 600; padding: 10px 25px; cursor: pointer; border-radius: 6px; background: var(--bold-gris-claro); color: var(--bold-azul); border: none; transition: all 0.2s ease; }
         .tab.active { background: var(--bold-coral); color: #fff; box-shadow: 0 4px 6px rgba(255, 40, 71, 0.2); }
 
+        /* TOGGLE SWITCH (SEMANAS / MESES) */
         .view-toggle { display: flex; align-items: center; gap: 12px; background: #fff; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 5px rgba(0,0,0,0.02); color: var(--bold-azul); font-size: 13px; }
         #label-semanas { font-weight: 700; opacity: 1; transition: 0.3s; }
         #label-meses { font-weight: 400; opacity: 0.5; transition: 0.3s; }
@@ -64,14 +71,16 @@
         input:checked + .slider { background-color: var(--bold-coral); }
         input:checked + .slider:before { transform: translateX(22px); }
 
+        /* CONVENCIONES DE ÁREAS */
         .legend-container { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; margin-bottom: 20px; padding: 12px 15px; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .legend-title { font-weight: 700; font-size: 13px; margin-right: 5px; color: var(--bold-azul); }
         .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #555;}
         .legend-color { width: 14px; height: 14px; border-radius: 50%; display: inline-block; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
 
+        /* ==========================================================================
+           CALENDARIO Y GANTT CORE
+           ========================================================================== */
         .timeline-wrapper { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 0; overflow-x: auto; overflow-y: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
-        
-        /* EL PUNTO DULCE DE ANCHO: 3800px. Suficiente para que no se amontonen, pero sin scroll infinito */
         .timeline-scroll-area { min-width: 3800px; position: relative; display: flex; flex-direction: column; transition: min-width 0.4s ease-out; }
         .timeline-scroll-area.monthly-view { min-width: 1400px; }
         .timeline-scroll-area.monthly-view .weeks-header { display: none; }
@@ -92,27 +101,17 @@
         .grid-week { flex: 1; border-right: 1px dashed var(--bold-gris-claro); box-sizing: border-box; height: 100%; transition: border-color 0.3s ease;}
         .grid-month-container .grid-week:last-child { border-right: none; }
 
+        /* ==========================================================================
+           CÁPSULAS DE PROYECTOS Y ESTADO DE CARGA
+           ========================================================================== */
         .projects-area { position: relative; margin-top: 25px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
 
-        /* VUELVEN LAS CÁPSULAS HERMOSAS Y SÓLIDAS */
         .project-bar { 
-            position: absolute; 
-            height: 30px; 
-            border-radius: 15px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 12px; 
-            color: white; 
-            font-size: 11.5px; 
-            font-weight: 600; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
-            box-sizing: border-box; 
-            gap: 10px;
-            
-            /* LA MAGIA: Asegura que la caja siempre sea lo suficientemente ancha para el texto */
-            min-width: max-content; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: absolute; height: 30px; border-radius: 15px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 12px; color: white; font-size: 11.5px; font-weight: 600; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15); box-sizing: border-box; gap: 10px;
+            min-width: max-content; transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
         .project-bar:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 100 !important; cursor: default; }
@@ -128,6 +127,11 @@
         
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--bold-coral); z-index: 20; pointer-events: none;}
         .today-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: var(--bold-coral); color: white; padding: 5px 16px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.25);}
+
+        /* DISEÑO DEL LOADER DE OPTIMIZACIÓN */
+        .loader-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: var(--bold-azul); font-weight: 600; }
+        .spinner { width: 40px; height: 40px; border: 4px solid var(--bold-gris-claro); border-top: 4px solid var(--bold-coral); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
     </style>
 </head>
@@ -179,7 +183,8 @@
                 <div class="weeks-header" id="weeks-header"></div>
                 <div class="grid-lines" id="grid-lines"></div>
                 
-                <div class="projects-area" id="projects-container"></div>
+                <div class="projects-area" id="projects-container">
+                    </div>
 
                 <div id="today-marker" class="today-line" style="display: none;">
                     <div class="today-label">Hoy</div>
@@ -190,6 +195,9 @@
     </div> 
 
     <script>
+        // ==========================================================================
+        // CONFIGURACIÓN BASE
+        // ==========================================================================
         const sheetApiUrl = 'https://script.google.com/macros/s/AKfycbynd7JOqdCceaBVf_AEBaoxhSCNg-5MNZvVb2_xQHI8hJVfvR0dd8IIPgd4A4GCMWWk/exec'; 
         
         const wStart = new Date(2026, 0, 1, 0, 0, 0);
@@ -199,46 +207,9 @@
         let currentTab = 'appian'; 
         let data = []; 
 
-        function renderCalendarHeaders() {
-            const monthsNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
-            
-            const quarters = [
-                { name: 'Q1', days: 31 + 28 + 31 },
-                { name: 'Q2', days: 30 + 31 + 30 },
-                { name: 'Q3', days: 31 + 31 + 30 },
-                { name: 'Q4', days: 31 + 30 + 31 }
-            ];
-
-            let htmlQuarters = '';
-            quarters.forEach(q => {
-                const qWidth = (q.days / totalDays) * 100;
-                htmlQuarters += `<div class="quarter" style="width: ${qWidth}%;">${q.name}</div>`;
-            });
-            document.getElementById('quarters-header').innerHTML = htmlQuarters;
-
-            let htmlMonths = '';
-            let htmlWeeks = '';
-            let htmlGrid = '';
-
-            daysInMonths.forEach((days, i) => {
-                const monthWidthPct = (days / totalDays) * 100;
-                htmlMonths += `<div class="month" style="width: ${monthWidthPct}%;">${monthsNames[i]}</div>`;
-                htmlGrid += `<div class="grid-month-container" style="width: ${monthWidthPct}%;">`;
-
-                for(let w = 1; w <= 4; w++) {
-                    const weekWidthPct = monthWidthPct / 4;
-                    htmlWeeks += `<div class="week" style="width: ${weekWidthPct}%;">Semana ${w}</div>`;
-                    htmlGrid += `<div class="grid-week"></div>`;
-                }
-                htmlGrid += `</div>`; 
-            });
-
-            document.getElementById('months-header').innerHTML = htmlMonths;
-            document.getElementById('weeks-header').innerHTML = htmlWeeks;
-            document.getElementById('grid-lines').innerHTML = htmlGrid;
-        }
-
+        // ==========================================================================
+        // UTILIDADES Y CÁLCULOS
+        // ==========================================================================
         function normalizeText(text) {
             if (!text) return 'default';
             return text.toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, '-');
@@ -247,31 +218,13 @@
         function parseDateSafe(dateValue) {
             if (!dateValue) return null;
             const match = dateValue.toString().match(/(\d{4})-(\d{2})-(\d{2})/);
-            if(match) {
-               return new Date(match[1], match[2] - 1, match[3], 12, 0, 0);
-            }
-            return new Date(dateValue);
+            return match ? new Date(match[1], match[2] - 1, match[3], 12, 0, 0) : new Date(dateValue);
         }
 
         function getTimelinePosition(dateValue) {
             const date = parseDateSafe(dateValue);
             if (!date) return null;
-            const daysFromStart = (date - wStart) / (1000 * 60 * 60 * 24);
-            return (daysFromStart / totalDays) * 100; 
-        }
-
-        function renderTodayLine() {
-            const today = new Date(); 
-            const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-            const todayPercentage = getTimelinePosition(formattedToday);
-            const todayMarker = document.getElementById('today-marker');
-            
-            if (todayPercentage >= 0 && todayPercentage <= 100) {
-                todayMarker.style.left = `${todayPercentage}%`;
-                todayMarker.style.display = 'block';
-            } else {
-                todayMarker.style.display = 'none';
-            }
+            return ((date - wStart) / (1000 * 60 * 60 * 24) / totalDays) * 100; 
         }
 
         function scrollToToday() {
@@ -279,34 +232,43 @@
             const scrollArea = document.querySelector('.timeline-scroll-area');
             if (!wrapper || !scrollArea) return;
             
-            const scrollWidth = scrollArea.offsetWidth;
-            const wrapperWidth = wrapper.offsetWidth;
-            const today = new Date();
-            const daysPassed = (today - wStart) / (1000 * 60 * 60 * 24);
-            const todayPosition = (daysPassed / 365) * scrollWidth;
-            
-            const targetLeft = Math.max(0, todayPosition - (wrapperWidth / 2)); 
-            wrapper.scrollTo({ left: targetLeft, behavior: 'smooth' });
+            const todayPosition = (((new Date() - wStart) / (1000 * 60 * 60 * 24)) / 365) * scrollArea.offsetWidth;
+            wrapper.scrollTo({ left: Math.max(0, todayPosition - (wrapper.offsetWidth / 2)), behavior: 'smooth' });
         }
 
-        function toggleViewMode() {
-            const isMonthly = document.getElementById('viewToggle').checked;
-            const scrollArea = document.getElementById('mainScrollArea');
-            const toggleContainer = document.getElementById('toggleContainer');
+        // ==========================================================================
+        // RENDERIZADO VISUAL
+        // ==========================================================================
+        function renderCalendarHeaders() {
+            const monthsNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
+            const quarters = [ {name:'Q1', d:90}, {name:'Q2', d:91}, {name:'Q3', d:92}, {name:'Q4', d:92} ];
+
+            document.getElementById('quarters-header').innerHTML = quarters.map(q => `<div class="quarter" style="width: ${(q.d/totalDays)*100}%;">${q.name}</div>`).join('');
             
-            if (isMonthly) {
-                scrollArea.classList.add('monthly-view');
-                toggleContainer.classList.add('monthly-active');
-            } else {
-                scrollArea.classList.remove('monthly-view');
-                toggleContainer.classList.remove('monthly-active');
+            let htmlMonths = '', htmlWeeks = '', htmlGrid = '';
+            daysInMonths.forEach((days, i) => {
+                const monthWidth = (days / totalDays) * 100;
+                htmlMonths += `<div class="month" style="width: ${monthWidth}%;">${monthsNames[i]}</div>`;
+                htmlGrid += `<div class="grid-month-container" style="width: ${monthWidth}%;">`;
+                for(let w = 1; w <= 4; w++) {
+                    htmlWeeks += `<div class="week" style="width: ${monthWidth/4}%;">Semana ${w}</div>`;
+                    htmlGrid += `<div class="grid-week"></div>`;
+                }
+                htmlGrid += `</div>`; 
+            });
+
+            document.getElementById('months-header').innerHTML = htmlMonths;
+            document.getElementById('weeks-header').innerHTML = htmlWeeks;
+            document.getElementById('grid-lines').innerHTML = htmlGrid;
+
+            // Renderizar "Hoy" Inmediatamente
+            const todayPct = getTimelinePosition(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`);
+            const todayMarker = document.getElementById('today-marker');
+            if (todayPct >= 0 && todayPct <= 100) {
+                todayMarker.style.left = `${todayPct}%`;
+                todayMarker.style.display = 'block';
             }
-            
-            // Re-calcula la cascada después de que la transición de CSS comprime la pantalla
-            setTimeout(() => {
-                renderProjects();
-                scrollToToday();
-            }, 300);
         }
 
         function renderProjects() {
@@ -318,23 +280,19 @@
 
             let filteredData = data.filter(p => {
                 const tabCategory = p['Frente de trabajo'] || p['Frente'] || p['Plataforma'] || p['Equipo'];
-                if (!tabCategory) return false;
-                return tabCategory.toString().toLowerCase().trim() === currentTab;
+                return tabCategory && tabCategory.toString().toLowerCase().trim() === currentTab;
             });
 
             filteredData.sort((a, b) => {
                 const dateA = parseDateSafe(a['Fecha de Inicio'])?.getTime() || 0;
                 const dateB = parseDateSafe(b['Fecha de Inicio'])?.getTime() || 0;
-
                 if (dateA !== dateB) return dateA - dateB;
 
                 const areaA = normalizeText(a['Área']);
                 const areaB = normalizeText(b['Área']);
                 if (areaA !== areaB) return areaA.localeCompare(areaB);
 
-                const endA = parseDateSafe(a['Fecha de Fin'])?.getTime() || 0;
-                const endB = parseDateSafe(b['Fecha de Fin'])?.getTime() || 0;
-                return endB - endA; 
+                return (parseDateSafe(b['Fecha de Fin'])?.getTime() || 0) - (parseDateSafe(a['Fecha de Fin'])?.getTime() || 0); 
             });
 
             const rowEndPositions = [];
@@ -343,69 +301,48 @@
             filteredData.forEach(project => {
                 const leftPos = getTimelinePosition(project['Fecha de Inicio']);
                 const rightPos = getTimelinePosition(project['Fecha de Fin']);
-                
                 if (leftPos === null || rightPos === null) return;
-                
-                let width = rightPos - leftPos;
                 
                 if (rightPos > 0 && leftPos < 100) {
                     const bar = document.createElement('div');
                     bar.className = 'project-bar';
-                    
                     const areaKey = normalizeText(project['Área']);
                     bar.setAttribute('data-area', areaKey);
                     
                     const displayLeft = Math.max(0, leftPos);
-                    const displayWidth = width - (displayLeft - leftPos);
-                    const finalWidth = Math.min(displayWidth, 100 - displayLeft);
+                    const finalWidth = Math.min(rightPos - leftPos - (displayLeft - leftPos), 100 - displayLeft);
 
-                    // Posición inicial y ancho base según el tiempo
                     bar.style.left = `${displayLeft}%`;
                     bar.style.width = `${finalWidth}%`;
-                    
-                    if (areaKey === 'default') {
-                        bar.style.background = `var(--area-default)`;
-                    } else {
-                        bar.style.background = `var(--area-${areaKey}, var(--bold-azul))`;
-                    }
+                    bar.style.background = areaKey === 'default' ? `var(--area-default)` : `var(--area-${areaKey}, var(--bold-azul))`;
 
                     const statusKey = normalizeText(project['Estado']);
-                    const statusColor = `var(--status-${statusKey}, #ccc)`; 
-                    const projName = project['Nombre del proyecto'] || 'Sin nombre';
                     const devName = project['Desarrollador'] || '';
+                    const projName = project['Nombre del proyecto'] || 'Sin nombre';
 
                     bar.innerHTML = `
                         <span class="project-title" title="${projName}">${projName}</span>
                         <div class="badges">
                             ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
-                            <span class="status-badge" style="background-color: ${statusColor}" title="Estado: ${project['Estado']}"></span>
+                            <span class="status-badge" style="background-color: var(--status-${statusKey}, #ccc)"></span>
                         </div>
                     `;
-                    
                     container.appendChild(bar);
 
-                    // LA MAGIA DE LA CASCADA: Medimos cuánto espacio REAL ocupa la cápsula en pixeles
-                    const actualWidthPx = bar.offsetWidth;
-                    // Convertimos ese espacio real a porcentaje
-                    const visualWidthPct = (actualWidthPx / containerWidth) * 100;
-                    
-                    // Aseguramos que la siguiente fila tome en cuenta el tamaño de la caja expandida para no chocar
-                    const visualRightPos = displayLeft + Math.max(finalWidth, visualWidthPct);
-
+                    const visualRightPos = displayLeft + Math.max(finalWidth, (bar.offsetWidth / containerWidth) * 100);
                     let currentRow = 0;
-                    // Margen de 0.2% de espacio para que no se peguen
-                    while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.2)) {
-                        currentRow++;
-                    }
+                    while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.2)) currentRow++;
                     
                     rowEndPositions[currentRow] = visualRightPos;
                     bar.style.top = `${currentRow * 40}px`; 
                 }
             });
-            
             container.style.height = `${rowEndPositions.length * 40 + 70}px`;
         }
 
+        // ==========================================================================
+        // INTERACCIONES Y LÓGICA DE CARGA OPTIMIZADA
+        // ==========================================================================
         function switchTab(team) {
             currentTab = team.toLowerCase().trim(); 
             document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
@@ -413,19 +350,50 @@
             renderProjects();
         }
 
+        function toggleViewMode() {
+            const isMonthly = document.getElementById('viewToggle').checked;
+            document.getElementById('mainScrollArea').classList.toggle('monthly-view', isMonthly);
+            document.getElementById('toggleContainer').classList.toggle('monthly-active', isMonthly);
+            setTimeout(() => { renderProjects(); scrollToToday(); }, 300);
+        }
+
         async function loadDataAndRender() {
+            renderCalendarHeaders(); // Dibuja la cuadrícula vacía INMEDIATAMENTE al abrir la página
+
+            const container = document.getElementById('projects-container');
+            const cachedData = localStorage.getItem('boldRoadmapData');
+
+            // 1. CARGA INSTANTÁNEA DESDE MEMORIA CACHÉ
+            if (cachedData) {
+                try {
+                    data = JSON.parse(cachedData);
+                    renderProjects();
+                    setTimeout(scrollToToday, 100);
+                } catch(e) { console.error("Error leyendo caché"); }
+            } else {
+                // Si es la primera vez, muestra el Spinner elegante
+                container.innerHTML = `<div class="loader-container"><div class="spinner"></div><span>Sincronizando proyectos...</span></div>`;
+            }
+
+            // 2. ACTUALIZACIÓN SILENCIOSA DESDE GOOGLE SHEETS
             try {
-                renderCalendarHeaders(); 
                 const response = await fetch(sheetApiUrl);
-                data = await response.json();
-                renderProjects();
-                setTimeout(scrollToToday, 200); 
-                renderTodayLine(); 
+                const freshData = await response.json();
+                
+                // Si la información nueva es distinta a la guardada, actualiza la pantalla
+                if (JSON.stringify(data) !== JSON.stringify(freshData)) {
+                    data = freshData;
+                    localStorage.setItem('boldRoadmapData', JSON.stringify(data));
+                    renderProjects();
+                    if (!cachedData) setTimeout(scrollToToday, 100); // Mueve a "Hoy" si era la primera carga
+                }
             } catch (error) {
-                console.error("Error", error);
+                console.error("Error sincronizando con Sheets", error);
+                if (!cachedData) container.innerHTML = `<div class="loader-container" style="color:red;"><span>Error de conexión. Intenta recargar la página.</span></div>`;
             }
         }
 
+        // Iniciar la magia
         loadDataAndRender();
     </script>
 </body>
