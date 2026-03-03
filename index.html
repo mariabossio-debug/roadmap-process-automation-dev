@@ -102,7 +102,7 @@
         .grid-month-container .grid-week:last-child { border-right: none; }
 
         /* ==========================================================================
-           CÁPSULAS DE PROYECTOS Y ESTADO DE CARGA
+           CÁPSULAS DE PROYECTOS, BADGES Y ESTADO DE CARGA
            ========================================================================== */
         .projects-area { position: relative; margin-top: 25px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
 
@@ -118,12 +118,24 @@
         .project-bar[data-area="legal"] { color: var(--bold-azul); }
 
         .project-title { white-space: nowrap; }
-
         .badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
         .badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600;}
         .project-bar[data-area="legal"] .badge { background: rgba(0,0,0,0.1); }
-        .status-badge { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid white; background-color: #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.3);}
-        .project-bar[data-area="legal"] .status-badge { border-color: var(--bold-azul); }
+
+        /* NUEVOS ESTILOS PARA LOS ÍCONOS DE STATUS EN PNG */
+        .status-icon {
+            height: 16px; /* Tamaño ideal para que se lea la palabra dev/test/prod */
+            width: auto;
+            display: inline-block;
+            margin-left: 2px;
+            /* TRUCO CSS: Transforma cualquier imagen a blanco puro brillante */
+            filter: brightness(0) invert(1);
+        }
+
+        /* Excepción para la barra 'Legal' (fondo amarillo). Para que no se pierda el ícono blanco, lo pintamos del Azul Corporativo de Bold (#121E6C) */
+        .project-bar[data-area="legal"] .status-icon {
+            filter: brightness(0) invert(12%) sepia(35%) saturate(5412%) hue-rotate(227deg) brightness(90%) contrast(106%);
+        }
         
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--bold-coral); z-index: 20; pointer-events: none;}
         .today-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: var(--bold-coral); color: white; padding: 5px 16px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.25);}
@@ -320,11 +332,18 @@
                     const devName = project['Desarrollador'] || '';
                     const projName = project['Nombre del proyecto'] || 'Sin nombre';
 
+                    // LÓGICA PARA INYECTAR LAS IMÁGENES PNG EN BLANCO
+                    let iconHtml = '';
+                    if (statusKey === 'dev') iconHtml = `<img src="dev.png" class="status-icon" title="Estado: Dev">`;
+                    else if (statusKey === 'test') iconHtml = `<img src="test.png" class="status-icon" title="Estado: Test">`;
+                    else if (statusKey === 'prod') iconHtml = `<img src="prod.png" class="status-icon" title="Estado: Prod">`;
+                    else if (statusKey === 'piloto') iconHtml = `<img src="piloto2.png" class="status-icon" title="Estado: Piloto">`;
+
                     bar.innerHTML = `
                         <span class="project-title" title="${projName}">${projName}</span>
                         <div class="badges">
                             ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
-                            <span class="status-badge" style="background-color: var(--status-${statusKey}, #ccc)"></span>
+                            ${iconHtml}
                         </div>
                     `;
                     container.appendChild(bar);
@@ -358,7 +377,7 @@
         }
 
         async function loadDataAndRender() {
-            renderCalendarHeaders(); // Dibuja la cuadrícula vacía INMEDIATAMENTE al abrir la página
+            renderCalendarHeaders(); 
 
             const container = document.getElementById('projects-container');
             const cachedData = localStorage.getItem('boldRoadmapData');
@@ -371,7 +390,6 @@
                     setTimeout(scrollToToday, 100);
                 } catch(e) { console.error("Error leyendo caché"); }
             } else {
-                // Si es la primera vez, muestra el Spinner elegante
                 container.innerHTML = `<div class="loader-container"><div class="spinner"></div><span>Sincronizando proyectos...</span></div>`;
             }
 
@@ -380,12 +398,11 @@
                 const response = await fetch(sheetApiUrl);
                 const freshData = await response.json();
                 
-                // Si la información nueva es distinta a la guardada, actualiza la pantalla
                 if (JSON.stringify(data) !== JSON.stringify(freshData)) {
                     data = freshData;
                     localStorage.setItem('boldRoadmapData', JSON.stringify(data));
                     renderProjects();
-                    if (!cachedData) setTimeout(scrollToToday, 100); // Mueve a "Hoy" si era la primera carga
+                    if (!cachedData) setTimeout(scrollToToday, 100); 
                 }
             } catch (error) {
                 console.error("Error sincronizando con Sheets", error);
@@ -393,7 +410,6 @@
             }
         }
 
-        // Iniciar la magia
         loadDataAndRender();
     </script>
 </body>
