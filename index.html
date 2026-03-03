@@ -71,9 +71,9 @@
 
         .timeline-wrapper { background: #fff; border: 1px solid var(--border-color); border-radius: 8px; padding: 0; overflow-x: auto; overflow-y: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);}
         
-        /* EL PUNTO DULCE DE ANCHO: 3800px. Suficiente para que no se amontonen, pero sin scroll infinito */
-        .timeline-scroll-area { min-width: 3800px; position: relative; display: flex; flex-direction: column; transition: min-width 0.4s ease-out; }
-        .timeline-scroll-area.monthly-view { min-width: 1400px; }
+        /* ANCHOS OPTIMIZADOS PARA CERO BUGS */
+        .timeline-scroll-area { min-width: 2800px; position: relative; display: flex; flex-direction: column; transition: min-width 0.4s ease-out; }
+        .timeline-scroll-area.monthly-view { min-width: 1500px; }
         .timeline-scroll-area.monthly-view .weeks-header { display: none; }
         .timeline-scroll-area.monthly-view .grid-week { border-right-color: transparent; }
 
@@ -94,37 +94,51 @@
 
         .projects-area { position: relative; margin-top: 25px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
 
-        /* VUELVEN LAS CÁPSULAS HERMOSAS Y SÓLIDAS */
-        .project-bar { 
+        /* =========================================================
+           NUEVA ARQUITECTURA GANTT (Fechas Inquebrantables)
+           ========================================================= */
+        .project-wrap { 
             position: absolute; 
             height: 30px; 
-            border-radius: 15px; 
             display: flex; 
             align-items: center; 
-            justify-content: space-between; 
-            padding: 0 12px; 
-            color: white; 
-            font-size: 11.5px; 
-            font-weight: 600; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
             box-sizing: border-box; 
-            gap: 10px;
-            
-            /* LA MAGIA: Asegura que la caja siempre sea lo suficientemente ancha para el texto */
-            min-width: max-content; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            cursor: default;
         }
         
-        .project-bar:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 100 !important; cursor: default; }
-        .project-bar[data-area="legal"] { color: var(--bold-azul); }
+        .project-wrap:hover { transform: translateY(-2px); filter: brightness(1.1); z-index: 100 !important; }
 
-        .project-title { white-space: nowrap; }
+        /* Esta capa es el color. JS dictará su ancho en Píxeles exactos según la fecha. */
+        .project-color {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            z-index: 1;
+        }
+
+        /* Esta capa es el texto. Fluye por encima. Si sobra, no deforma la caja de color. */
+        .project-text {
+            position: relative;
+            z-index: 2;
+            padding: 0 12px;
+            display: flex; align-items: center; gap: 8px;
+            white-space: nowrap; /* El texto JAMÁS se corta */
+            color: #fff;
+            /* Sombra sutil que hace que el texto sea leíble incluso si se sale de la barra hacia lo blanco */
+            text-shadow: 0px 1px 3px rgba(0,0,0,0.8); 
+            font-size: 11.5px; font-weight: 600;
+        }
 
         .badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
-        .badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600;}
-        .project-bar[data-area="legal"] .badge { background: rgba(0,0,0,0.1); }
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600; color: #fff; text-shadow: none; box-shadow: 0 1px 2px rgba(0,0,0,0.2);}
         .status-badge { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid white; background-color: #ccc; box-shadow: 0 1px 3px rgba(0,0,0,0.3);}
-        .project-bar[data-area="legal"] .status-badge { border-color: var(--bold-azul); }
+        
+        /* Excepción para "Legal" (Amarillo) */
+        .project-wrap[data-area="legal"] .project-text { color: var(--bold-azul); text-shadow: none; }
+        .project-wrap[data-area="legal"] .badge { background: rgba(0,0,0,0.1); color: var(--bold-azul); box-shadow: none;}
+        .project-wrap[data-area="legal"] .status-badge { border-color: var(--bold-azul); }
         
         .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--bold-coral); z-index: 20; pointer-events: none;}
         .today-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: var(--bold-coral); color: white; padding: 5px 16px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.25);}
@@ -144,8 +158,8 @@
         
         <div class="controls-header">
             <div class="tabs">
-                <button class="tab" onclick="switchTab('Automation IA')">Automation IA</button>
                 <button class="tab active" onclick="switchTab('Appian')">Appian</button>
+                <button class="tab" onclick="switchTab('Automation IA')">Automation IA</button>
             </div>
             
             <div class="view-toggle" id="toggleContainer">
@@ -302,11 +316,11 @@
                 toggleContainer.classList.remove('monthly-active');
             }
             
-            // Re-calcula la cascada después de que la transición de CSS comprime la pantalla
+            // Le damos tiempo al CSS para achicar/agrandar la pantalla antes de recalcular colisiones
             setTimeout(() => {
                 renderProjects();
                 scrollToToday();
-            }, 300);
+            }, 450);
         }
 
         function renderProjects() {
@@ -322,6 +336,7 @@
                 return tabCategory.toString().toLowerCase().trim() === currentTab;
             });
 
+            // Ordenamiento Cascada: 1) Fecha Inicio, 2) Área, 3) Duración
             filteredData.sort((a, b) => {
                 const dateA = parseDateSafe(a['Fecha de Inicio'])?.getTime() || 0;
                 const dateB = parseDateSafe(b['Fecha de Inicio'])?.getTime() || 0;
@@ -338,7 +353,8 @@
             });
 
             const rowEndPositions = [];
-            const containerWidth = scrollArea.offsetWidth || 3800; 
+            // Tomamos el ancho real de la pantalla actual para hacer matemáticas precisas
+            const containerWidth = scrollArea.offsetWidth || 2800; 
 
             filteredData.forEach(project => {
                 const leftPos = getTimelinePosition(project['Fecha de Inicio']);
@@ -346,64 +362,65 @@
                 
                 if (leftPos === null || rightPos === null) return;
                 
-                let width = rightPos - leftPos;
+                let widthPct = rightPos - leftPos;
                 
                 if (rightPos > 0 && leftPos < 100) {
-                    const bar = document.createElement('div');
-                    bar.className = 'project-bar';
+                    const displayLeft = Math.max(0, leftPos);
+                    const displayWidthPct = widthPct - (displayLeft - leftPos);
+                    const finalWidthPct = Math.min(displayWidthPct, 100 - displayLeft);
+
+                    const wrap = document.createElement('div');
+                    wrap.className = 'project-wrap';
                     
                     const areaKey = normalizeText(project['Área']);
-                    bar.setAttribute('data-area', areaKey);
+                    wrap.setAttribute('data-area', areaKey);
                     
-                    const displayLeft = Math.max(0, leftPos);
-                    const displayWidth = width - (displayLeft - leftPos);
-                    const finalWidth = Math.min(displayWidth, 100 - displayLeft);
-
-                    // Posición inicial y ancho base según el tiempo
-                    bar.style.left = `${displayLeft}%`;
-                    bar.style.width = `${finalWidth}%`;
+                    wrap.style.left = `${displayLeft}%`;
                     
-                    if (areaKey === 'default') {
-                        bar.style.background = `var(--area-default)`;
-                    } else {
-                        bar.style.background = `var(--area-${areaKey}, var(--bold-azul))`;
-                    }
-
+                    // Cálculo matemático estricto: ¿Cuántos pixeles mide la fecha de este proyecto?
+                    const barWidthPx = (finalWidthPct / 100) * containerWidth;
+                    
+                    // Obligamos al contenedor a medir al menos eso
+                    wrap.style.minWidth = `${barWidthPx}px`;
+                    
+                    let bgColor = areaKey === 'default' ? `var(--area-default)` : `var(--area-${areaKey}, var(--bold-azul))`;
                     const statusKey = normalizeText(project['Estado']);
                     const statusColor = `var(--status-${statusKey}, #ccc)`; 
                     const projName = project['Nombre del proyecto'] || 'Sin nombre';
                     const devName = project['Desarrollador'] || '';
 
-                    bar.innerHTML = `
-                        <span class="project-title" title="${projName}">${projName}</span>
-                        <div class="badges">
-                            ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
-                            <span class="status-badge" style="background-color: ${statusColor}" title="Estado: ${project['Estado']}"></span>
+                    // Inyectamos la barra de color (tamaño fijo) y el texto (tamaño libre)
+                    wrap.innerHTML = `
+                        <div class="project-color" style="width: ${barWidthPx}px; background: ${bgColor};"></div>
+                        <div class="project-text">
+                            <span title="${projName}">${projName}</span>
+                            <div class="badges">
+                                ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
+                                <span class="status-badge" style="background-color: ${statusColor}" title="Estado: ${project['Estado']}"></span>
+                            </div>
                         </div>
                     `;
                     
-                    container.appendChild(bar);
+                    container.appendChild(wrap);
 
-                    // LA MAGIA DE LA CASCADA: Medimos cuánto espacio REAL ocupa la cápsula en pixeles
-                    const actualWidthPx = bar.offsetWidth;
-                    // Convertimos ese espacio real a porcentaje
+                    // LA MAGIA: Preguntamos cuánto midió la caja al final (incluyendo el texto largo)
+                    const actualWidthPx = wrap.offsetWidth;
                     const visualWidthPct = (actualWidthPx / containerWidth) * 100;
                     
-                    // Aseguramos que la siguiente fila tome en cuenta el tamaño de la caja expandida para no chocar
-                    const visualRightPos = displayLeft + Math.max(finalWidth, visualWidthPct);
+                    // Calculamos dónde termina realmente el texto para la cascada anti-choques
+                    const visualRightPos = displayLeft + visualWidthPct;
 
                     let currentRow = 0;
-                    // Margen de 0.2% de espacio para que no se peguen
                     while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.2)) {
                         currentRow++;
                     }
                     
                     rowEndPositions[currentRow] = visualRightPos;
-                    bar.style.top = `${currentRow * 40}px`; 
+                    wrap.style.top = `${currentRow * 38}px`; 
                 }
             });
             
-            container.style.height = `${rowEndPositions.length * 40 + 70}px`;
+            container.style.height = `${rowEndPositions.length * 38 + 60}px`;
         }
 
         function switchTab(team) {
