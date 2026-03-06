@@ -1,7 +1,6 @@
 const sheetApiUrl = 'https://script.google.com/macros/s/AKfycbynd7JOqdCceaBVf_AEBaoxhSCNg-5MNZvVb2_xQHI8hJVfvR0dd8IIPgd4A4GCMWWk/exec'; 
 
 const wStart = new Date(2026, 0, 1, 0, 0, 0);
-// Usamos 365 días exactos para evitar decimales que desfasen los cálculos
 const totalDays = 365; 
 
 let currentTab = 'appian'; 
@@ -126,25 +125,18 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
-// =========================================================================
-// CORRECCIÓN MAGISTRAL: "LA APLANADORA DE FECHAS"
-// =========================================================================
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
     const str = dateValue.toString().trim();
     
-    // 1. Detección a prueba de balas para formato Latino (DD/MM/YYYY)
     const parts = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
     if (parts) {
         return new Date(parts[3], parts[2] - 1, parts[1], 0, 0, 0);
     }
 
-    // 2. Parseo estándar si viene en otro formato
     const temp = new Date(str);
     if (isNaN(temp.getTime())) return null;
 
-    // 3. ¡LA MAGIA!: Extraemos SOLO el año, mes y día limpios, y clavamos la hora a las 00:00:00 exactas.
-    // Esto borra por completo cualquier "hora fantasma" que traiga Google Sheets.
     return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
 }
 
@@ -156,7 +148,6 @@ function getTimelinePosition(dateValue) {
 
 function renderTodayLine() {
     const today = new Date(); 
-    // Aplanamos también la línea roja de "Hoy" a las 00:00:00 para que todo empate al milímetro
     const flatToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     
     const todayPercentage = ((flatToday.getTime() - wStart.getTime()) / (1000 * 60 * 60 * 24) / totalDays) * 100; 
@@ -169,7 +160,6 @@ function renderTodayLine() {
         todayMarker.style.display = 'none';
     }
 }
-// =========================================================================
 
 function scrollToToday() {
     const wrapper = document.querySelector('.timeline-wrapper');
@@ -219,8 +209,8 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    const isMonthly = scrollArea.classList.contains('monthly-view');
-    const rowSpacing = isMonthly ? 55 : 40; 
+    // ESPACIO VERTICAL AUMENTADO (55px) PARA QUE QUEPAN LAS TARJETAS GORDITAS
+    const rowSpacing = 55; 
 
     filteredData.forEach(project => {
         const leftPos = getTimelinePosition(project['Fecha de Inicio']);
@@ -288,7 +278,7 @@ function renderProjects() {
         }
     });
     
-    container.style.height = `${rowEndPositions.length * rowSpacing + 70}px`;
+    container.style.height = `${rowEndPositions.length * rowSpacing + 90}px`;
 }
 
 function switchTab(team) {
