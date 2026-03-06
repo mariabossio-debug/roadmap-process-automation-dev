@@ -125,18 +125,33 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
+// =========================================================================
+// CORRECCIÓN 1: APLANADORA DE FECHAS (Adiós al desfase visual)
+// =========================================================================
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
     const str = dateValue.toString().trim();
     
+    // Captura el formato ISO que manda Google Sheets (ej. 2026-02-15T05:00:00Z)
+    const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+    if (isoMatch) {
+        return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3], 0, 0, 0); // Hora 00:00 estricta
+    }
+
+    // Captura formatos normales DD/MM/YYYY
     const parts = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
     if (parts) {
         return new Date(parts[3], parts[2] - 1, parts[1], 0, 0, 0);
     }
 
+    // Captura formatos YYYY-MM-DD
+    const ymdMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (ymdMatch) {
+        return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3], 0, 0, 0);
+    }
+
     const temp = new Date(str);
     if (isNaN(temp.getTime())) return null;
-
     return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
 }
 
@@ -149,7 +164,6 @@ function getTimelinePosition(dateValue) {
 function renderTodayLine() {
     const today = new Date(); 
     const flatToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
-    
     const todayPercentage = ((flatToday.getTime() - wStart.getTime()) / (1000 * 60 * 60 * 24) / totalDays) * 100; 
     
     const todayMarker = document.getElementById('today-marker');
@@ -209,16 +223,19 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    // ESPACIO VERTICAL AUMENTADO (55px) PARA QUE QUEPAN LAS TARJETAS GORDITAS
-    const rowSpacing = 55; 
+    // =========================================================================
+    // CORRECCIÓN 2: MOTOR MATEMÁTICO ANTI-CHOQUES Y ANT-APLASTAMIENTO
+    // =========================================================================
+    const rowSpacing = 52; // Espacio garantizado entre filas para que respiren las tarjetas
+
+    // Ancho mínimo exigido para que el texto NUNCA se aplaste (180 píxeles convertidos a porcentaje)
+    const minWidthPct = (180 / containerWidth) * 100;
 
     filteredData.forEach(project => {
         const leftPos = getTimelinePosition(project['Fecha de Inicio']);
         const rightPos = getTimelinePosition(project['Fecha de Fin']);
         
         if (leftPos === null || rightPos === null) return;
-        
-        let width = rightPos - leftPos;
         
         if (rightPos > 0 && leftPos < 100) {
             const bar = document.createElement('div');
@@ -229,11 +246,16 @@ function renderProjects() {
             bar.setAttribute('data-area', areaKey);
             
             const displayLeft = Math.max(0, leftPos);
-            const displayWidth = width - (displayLeft - leftPos);
-            const finalWidth = Math.min(displayWidth, 100 - displayLeft);
+            
+            // El ancho puro según las fechas
+            let dateWidthPct = rightPos - leftPos;
+            let visibleDateWidthPct = Math.min(dateWidthPct - (displayLeft - leftPos), 100 - displayLeft);
+
+            // ¡LA MAGIA!: Obliga a la tarjeta a usar la fecha real, PERO si es muy chiquita, se asegura de darle sus 180px vitales para que el texto sobreviva.
+            const finalWidthPct = Math.max(minWidthPct, visibleDateWidthPct);
 
             bar.style.left = `${displayLeft}%`;
-            bar.style.width = `${finalWidth}%`;
+            bar.style.width = `${finalWidthPct}%`;
             
             if (areaKey === 'default') {
                 bar.style.background = `var(--area-default)`;
@@ -264,9 +286,8 @@ function renderProjects() {
             
             container.appendChild(bar);
 
-            const actualWidthPx = bar.offsetWidth;
-            const visualWidthPct = (actualWidthPx / containerWidth) * 100;
-            const visualRightPos = displayLeft + Math.max(finalWidth, visualWidthPct);
+            // Colisión Matemática estricta (ya no le pregunta al navegador y nunca falla)
+            const visualRightPos = displayLeft + finalWidthPct;
 
             let currentRow = 0;
             while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.2)) {
@@ -278,7 +299,7 @@ function renderProjects() {
         }
     });
     
-    container.style.height = `${rowEndPositions.length * rowSpacing + 90}px`;
+    container.style.height = `${rowEndPositions.length * rowSpacing + 80}px`;
 }
 
 function switchTab(team) {
