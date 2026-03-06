@@ -131,38 +131,39 @@ input:checked + .slider:before { transform: translateX(22px); }
 .projects-area { position: relative; margin-top: 25px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
 
 /* ==========================================================================
-   LA MAGIA: TARJETAS MÁS GORDITAS Y TEXTO EN 2 LÍNEAS
+   DISEÑO BASE DE LAS TARJETAS (NUEVO TAMAÑO GORDITO)
    ========================================================================== */
 .project-bar { 
     position: absolute; 
-    height: 44px; /* Tarjeta más alta (gordita) */
-    border-radius: 22px; /* Mantiene la forma de píldora elegante */
+    height: 44px; /* Tarjeta gruesa y estética */
+    border-radius: 22px; /* Perfectamente redonda en los bordes */
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    padding: 0 14px; 
+    padding: 0 16px; 
     color: white; 
-    font-size: 11px; 
+    font-size: 12px; /* Letra normal, legible, nada pequeño */
     font-weight: 600; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
     box-sizing: border-box; 
     gap: 8px; 
-    min-width: 160px; /* Ancho mínimo para que se lea siempre algo, pero no infinito */
+    /* El "min-width" se quitó de aquí porque ahora la matemática pura del JS se encarga */
     transition: transform 0.2s ease, box-shadow 0.2s ease; 
 }
 .project-bar:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 100 !important; cursor: default; }
 
 .project-title { 
-    white-space: normal; /* Permite que el texto baje al segundo renglón */
+    white-space: normal; /* Permite bajar al segundo renglón sin estirar la barra infinitamente */
     line-height: 1.2;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Obliga a usar máximo 2 renglones */
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex-grow: 1;
+    padding-right: 5px;
 }
 
-.badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
+.badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; } /* Protege los iconos para que jamás se aplasten */
 .badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600;}
 .status-icon { height: 18px; width: auto; display: inline-block; margin-left: 4px; filter: brightness(0) invert(1); }
 .status-icon.piloto-icon { transform: scale(1.15); }
