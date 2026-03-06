@@ -125,31 +125,16 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
-// =========================================================================
-// CORRECCIÓN 1: APLANADORA DE FECHAS (Adiós al desfase visual)
-// =========================================================================
+// APLANADORA DE HORAS: Fuerza todo a las 00:00:00 para alinear al milímetro
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
     const str = dateValue.toString().trim();
-    
-    // Captura el formato ISO que manda Google Sheets (ej. 2026-02-15T05:00:00Z)
     const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})T/);
-    if (isoMatch) {
-        return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3], 0, 0, 0); // Hora 00:00 estricta
-    }
-
-    // Captura formatos normales DD/MM/YYYY
+    if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3], 0, 0, 0); 
     const parts = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if (parts) {
-        return new Date(parts[3], parts[2] - 1, parts[1], 0, 0, 0);
-    }
-
-    // Captura formatos YYYY-MM-DD
+    if (parts) return new Date(parts[3], parts[2] - 1, parts[1], 0, 0, 0);
     const ymdMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (ymdMatch) {
-        return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3], 0, 0, 0);
-    }
-
+    if (ymdMatch) return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3], 0, 0, 0);
     const temp = new Date(str);
     if (isNaN(temp.getTime())) return null;
     return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
@@ -165,7 +150,6 @@ function renderTodayLine() {
     const today = new Date(); 
     const flatToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
     const todayPercentage = ((flatToday.getTime() - wStart.getTime()) / (1000 * 60 * 60 * 24) / totalDays) * 100; 
-    
     const todayMarker = document.getElementById('today-marker');
     if (todayPercentage >= 0 && todayPercentage <= 100) {
         todayMarker.style.left = `${todayPercentage}%`;
@@ -210,11 +194,9 @@ function renderProjects() {
         const dateA = parseDateSafe(a['Fecha de Inicio'])?.getTime() || 0;
         const dateB = parseDateSafe(b['Fecha de Inicio'])?.getTime() || 0;
         if (dateA !== dateB) return dateA - dateB;
-
         const areaA = normalizeText(a['Área']);
         const areaB = normalizeText(b['Área']);
         if (areaA !== areaB) return areaA.localeCompare(areaB);
-
         const endA = parseDateSafe(a['Fecha de Fin'])?.getTime() || 0;
         const endB = parseDateSafe(b['Fecha de Fin'])?.getTime() || 0;
         return endB - endA; 
@@ -223,13 +205,9 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    // =========================================================================
-    // CORRECCIÓN 2: MOTOR MATEMÁTICO ANTI-CHOQUES Y ANT-APLASTAMIENTO
-    // =========================================================================
-    const rowSpacing = 52; // Espacio garantizado entre filas para que respiren las tarjetas
-
-    // Ancho mínimo exigido para que el texto NUNCA se aplaste (180 píxeles convertidos a porcentaje)
-    const minWidthPct = (180 / containerWidth) * 100;
+    // MAGIA DE ESTILOS INFALIBLE DESDE JAVASCRIPT
+    const isMonthly = document.getElementById('viewToggle').checked;
+    const rowSpacing = isMonthly ? 56 : 40; 
 
     filteredData.forEach(project => {
         const leftPos = getTimelinePosition(project['Fecha de Inicio']);
@@ -246,16 +224,23 @@ function renderProjects() {
             bar.setAttribute('data-area', areaKey);
             
             const displayLeft = Math.max(0, leftPos);
-            
-            // El ancho puro según las fechas
-            let dateWidthPct = rightPos - leftPos;
-            let visibleDateWidthPct = Math.min(dateWidthPct - (displayLeft - leftPos), 100 - displayLeft);
-
-            // ¡LA MAGIA!: Obliga a la tarjeta a usar la fecha real, PERO si es muy chiquita, se asegura de darle sus 180px vitales para que el texto sobreviva.
-            const finalWidthPct = Math.max(minWidthPct, visibleDateWidthPct);
+            const displayWidthPct = Math.min(rightPos - leftPos - (displayLeft - leftPos), 100 - displayLeft);
 
             bar.style.left = `${displayLeft}%`;
-            bar.style.width = `${finalWidthPct}%`;
+            bar.style.width = `${displayWidthPct}%`;
+            
+            // INYECCIÓN DIRECTA DE ESTILOS GORDITOS SI ES MESES
+            if (isMonthly) {
+                bar.style.height = '48px';
+                bar.style.borderRadius = '24px';
+                bar.style.minWidth = '180px'; // Obliga a que siempre haya espacio para leer
+                bar.style.padding = '0 16px';
+            } else {
+                bar.style.height = '30px';
+                bar.style.borderRadius = '15px';
+                bar.style.minWidth = 'max-content';
+                bar.style.padding = '0 12px';
+            }
             
             if (areaKey === 'default') {
                 bar.style.background = `var(--area-default)`;
@@ -267,8 +252,7 @@ function renderProjects() {
             const devName = project['Desarrollador'] || '';
             const projName = project['Nombre del proyecto'] || 'Sin nombre';
 
-            const tooltipText = `Proyecto: ${projName}\nÁrea: ${rawArea}\nEstado: ${project['Estado'] || 'No definido'}`;
-            bar.setAttribute('title', tooltipText);
+            bar.setAttribute('title', `Proyecto: ${projName}\nÁrea: ${rawArea}\nEstado: ${project['Estado'] || 'No definido'}`);
 
             let iconHtml = '';
             if (statusKey === 'dev') iconHtml = `<img src="assets/dev.png" class="status-icon">`;
@@ -276,9 +260,14 @@ function renderProjects() {
             else if (statusKey === 'prod') iconHtml = `<img src="assets/prod.png" class="status-icon">`;
             else if (statusKey === 'piloto') iconHtml = `<img src="assets/piloto1.png" class="status-icon piloto-icon">`;
 
+            // INYECCIÓN DIRECTA DE ESTILOS DE TEXTO (2 LÍNEAS)
+            const titleStyle = isMonthly 
+                ? `white-space: normal; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; flex-grow: 1; padding-right: 6px; font-size: 11px; word-break: break-word;`
+                : `white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; padding-right: 6px; font-size: 11.5px;`;
+
             bar.innerHTML = `
-                <span class="project-title">${projName}</span>
-                <div class="badges">
+                <span class="project-title" style="${titleStyle}">${projName}</span>
+                <div class="badges" style="display: flex; gap: 5px; align-items: center; flex-shrink: 0;">
                     ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
                     ${iconHtml}
                 </div>
@@ -286,8 +275,10 @@ function renderProjects() {
             
             container.appendChild(bar);
 
-            // Colisión Matemática estricta (ya no le pregunta al navegador y nunca falla)
-            const visualRightPos = displayLeft + finalWidthPct;
+            // CÁLCULO DE COLISIÓN PERFECTO
+            const actualWidthPx = bar.getBoundingClientRect().width || bar.offsetWidth;
+            const visualWidthPct = (actualWidthPx / containerWidth) * 100;
+            const visualRightPos = displayLeft + visualWidthPct;
 
             let currentRow = 0;
             while (rowEndPositions[currentRow] !== undefined && rowEndPositions[currentRow] > (displayLeft - 0.2)) {
