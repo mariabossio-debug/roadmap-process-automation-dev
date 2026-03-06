@@ -126,11 +126,25 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
+// =========================================================================
+// CORRECCIÓN: BORRADOR DE HORAS PARA ALINEACIÓN PERFECTA DE FECHAS
+// =========================================================================
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
-    const match = dateValue.toString().match(/(\d{4})-(\d{2})-(\d{2})/);
-    if(match) return new Date(match[1], match[2] - 1, match[3], 12, 0, 0);
-    return new Date(dateValue);
+    let d;
+    const str = dateValue.toString().trim();
+    const match = str.match(/(\d{4})-(\d{2})-(\d{2})/);
+    
+    if (match) {
+        // Si viene en formato YYYY-MM-DD, forzamos las 00:00:00
+        d = new Date(match[1], match[2] - 1, match[3], 0, 0, 0);
+    } else {
+        // Cualquier otro formato, lo convertimos y forzamos a la medianoche
+        d = new Date(str);
+        d.setHours(0, 0, 0, 0);
+    }
+    
+    return isNaN(d.getTime()) ? null : d;
 }
 
 function getTimelinePosition(dateValue) {
@@ -141,6 +155,7 @@ function getTimelinePosition(dateValue) {
 
 function renderTodayLine() {
     const today = new Date(); 
+    today.setHours(0, 0, 0, 0); // También forzamos "hoy" a la medianoche para ser consistentes
     const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const todayPercentage = getTimelinePosition(formattedToday);
     const todayMarker = document.getElementById('today-marker');
@@ -200,7 +215,6 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    // MAGIA: Si estamos en meses, la fila necesita más altura porque la tarjeta es más gordita
     const isMonthly = scrollArea.classList.contains('monthly-view');
     const rowSpacing = isMonthly ? 55 : 40; 
 
@@ -214,7 +228,7 @@ function renderProjects() {
         
         if (rightPos > 0 && leftPos < 100) {
             const bar = document.createElement('div');
-            bar.className = 'project-bar'; // <-- Volvemos a tu clase original perfecta
+            bar.className = 'project-bar';
             
             const areaKey = normalizeText(project['Área']);
             const rawArea = project['Área'] || 'No definida';
