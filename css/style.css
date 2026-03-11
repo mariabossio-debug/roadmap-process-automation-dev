@@ -6,6 +6,7 @@
     --bold-gris-oscuro: #CCCCCC;
     --bold-gris-claro: #F2F2F2;
     --bold-gris-lineas: #A0AABF; 
+    
     --bg-page: var(--bold-blanco);
     --text-main: var(--bold-azul);
     --border-color: var(--bold-gris-oscuro);
@@ -16,6 +17,7 @@
     --area-credito: #5B3100; --area-partners: #A16B00; --area-sales-ops: #6CDCAB;
     --area-smb: #1E1E1E; --area-inbound: #606060; --area-cx: #969696;
     --area-sci: #FBF3F5; --area-procurement: #FFF3D1; --area-human-ops: #F3F3F3;
+    
     --area-default: linear-gradient(135deg, #d00030 0%, #00308f 100%); 
 }
 
@@ -110,45 +112,114 @@ input:checked + .slider:before { transform: translateX(22px); }
 .grid-week { flex: 1; border-right: 1px dashed var(--bold-gris-claro); box-sizing: border-box; height: 100%; transition: border-color 0.3s ease;}
 .grid-month-container .grid-week:last-child { border-right: none; }
 
-.projects-area { position: relative; margin-top: 25px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
+.projects-area { position: relative; margin-top: 35px; padding-bottom: 50px; min-height: 300px; z-index: 1; }
 
 /* ==========================================================================
-   DISEÑO BASE - TARJETAS (SEMANAS)
+   DISEÑO BASE DE LAS BARRAS "GORDITAS"
    ========================================================================== */
 .project-bar { 
     position: absolute; 
-    height: 30px; 
-    border-radius: 15px; 
+    height: 42px; 
+    border-radius: 21px; 
     display: flex; 
     align-items: center; 
-    justify-content: space-between; 
-    padding: 0 12px; 
+    padding: 0 16px; 
     color: white; 
-    font-size: 11.5px; 
-    font-weight: 600; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.15); 
     box-sizing: border-box; 
-    gap: 8px; 
+    /* ¡Magia! Garantiza que la barra SIEMPRE sea lo suficientemente ancha para leer algo,
+       incluso si dura 1 solo día, para que las burbujas quepan bien */
+    min-width: 140px; 
     transition: transform 0.2s ease, box-shadow 0.2s ease; 
 }
 .project-bar:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.25); z-index: 100 !important; cursor: default; }
 
 .project-title { 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
+    white-space: normal; 
+    line-height: 1.1;
+    font-size: 11.5px;
+    font-weight: 600;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Texto en máximo 2 renglones limpios */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
     flex-grow: 1; 
+    padding-right: 10px; /* Separación para que no pegue con el borde derecho */
 }
 
-.badges { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
-.badge { padding: 3px 8px; border-radius: 12px; font-size: 9px; background: rgba(255,255,255,0.25); font-weight: 600;}
-.status-icon { height: 18px; width: auto; display: inline-block; margin-left: 4px; filter: brightness(0) invert(1); }
-.status-icon.piloto-icon { transform: scale(1.15); }
+/* ==========================================================================
+   SISTEMA DE BURBUJAS FLOTANTES DE NOTIFICACIÓN
+   ========================================================================== */
+.floating-bubbles {
+    position: absolute;
+    top: -10px;    /* Flotan sobresaliendo por arriba */
+    right: -4px;   /* Sobresalen sutilmente por la derecha (la esquinita) */
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    z-index: 15;
+}
 
-/* EXCEPCIONES PARA ÁREAS CLARAS */
-.project-bar[data-area="legal-y-cumplimiento"], .project-bar[data-area="sci"], .project-bar[data-area="procurement"], .project-bar[data-area="human-ops"] { color: var(--bold-azul); }
-.project-bar[data-area="legal-y-cumplimiento"] .badge, .project-bar[data-area="sci"] .badge, .project-bar[data-area="procurement"] .badge, .project-bar[data-area="human-ops"] .badge { background: rgba(0,0,0,0.08); color: var(--bold-azul); }
-.project-bar[data-area="legal-y-cumplimiento"] .status-icon, .project-bar[data-area="sci"] .status-icon, .project-bar[data-area="procurement"] .status-icon, .project-bar[data-area="human-ops"] .status-icon { filter: brightness(0) invert(12%) sepia(35%) saturate(5412%) hue-rotate(227deg) brightness(90%) contrast(106%); }
+.bubble {
+    background: #ffffff;
+    border-radius: 12px; /* Redondas perfectas */
+    height: 22px;
+    width: 22px;         /* Tamaño delicado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border: 1px solid var(--bold-gris-claro);
+    box-sizing: border-box;
+}
+
+.bubble img {
+    height: 13px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Fuerza a los iconos de estado a ser Azul Bold para verse bien sobre fondo blanco */
+.bubble .status-icon {
+    filter: brightness(0) invert(12%) sepia(35%) saturate(5412%) hue-rotate(227deg) brightness(90%) contrast(106%) !important;
+}
+.bubble .piloto-icon { transform: scale(1.15); }
+
+/* BURBUJA DEL DESARROLLADOR EXPANDIBLE (TOOLTIP MÁGICO) */
+.dev-bubble {
+    width: 22px; /* Empieza como un círculo */
+    transition: width 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+    justify-content: flex-start;
+    cursor: default;
+}
+.dev-bubble:hover {
+    width: auto; /* Se expande hacia la derecha al pasar el mouse */
+    padding-right: 10px;
+}
+
+.dev-initial {
+    min-width: 20px; /* Fuerza a la letra inicial a mantenerse centrada en el círculo */
+    text-align: center;
+    font-weight: 800;
+    color: var(--bold-azul);
+    font-size: 11px;
+}
+
+.dev-full {
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--bold-azul);
+    opacity: 0;
+    margin-left: 2px;
+    transition: opacity 0.2s ease 0.1s; /* Retraso sutil para que aparezca suave */
+}
+.dev-bubble:hover .dev-full {
+    opacity: 1;
+}
+
+/* ========================================================================== */
 
 .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--bold-coral); z-index: 20; pointer-events: none;}
 .today-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: var(--bold-coral); color: white; padding: 5px 16px; border-radius: 12px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.25);}
@@ -160,27 +231,3 @@ input:checked + .slider:before { transform: translateX(22px); }
 .loader-container { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: var(--bold-azul); font-weight: 600; }
 .spinner-large { width: 40px; height: 40px; border: 4px solid var(--bold-gris-claro); border-top: 4px solid var(--bold-coral); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-/* ==========================================================================
-   DISEÑO GORDITO Y ESTRICTO (MESES) - ¡ESTO RESOLVERÁ TU PROBLEMA!
-   ========================================================================== */
-.timeline-scroll-area.monthly-view .project-bar {
-    height: auto !important;
-    min-height: 48px !important;    /* Tarjetas más altas (gorditas) */
-    border-radius: 12px !important; /* Bordes ligeramente más cuadrados, luce mejor en 2 líneas */
-    padding: 6px 12px !important;
-    align-items: center;
-    /* Un min-width muy sutil solo para proteger las imágenes de colapsar, pero NO estira la barra absurdamente */
-    min-width: 60px !important; 
-}
-
-.timeline-scroll-area.monthly-view .project-title {
-    white-space: normal !important; /* Permite bajar al renglón de abajo */
-    line-height: 1.2;
-    font-size: 11px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;          /* Limita a 2 renglones súper estéticos */
-    -webkit-box-orient: vertical;
-    overflow: hidden;               /* Esconde limpiamente lo que físicamente no quepa */
-    margin-right: 5px;
-}
