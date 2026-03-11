@@ -182,7 +182,6 @@ function renderProjects() {
 
     if (!data || data.length === 0) return;
 
-    // Detectamos en qué pestaña estamos para aplicar una visual u otra
     const isAppianTab = currentTab === 'appian';
 
     let filteredData = data.filter(p => {
@@ -208,7 +207,6 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    // Espacio vertical
     const rowSpacing = 56; 
 
     filteredData.forEach(project => {
@@ -251,9 +249,7 @@ function renderProjects() {
 
             const devName = project['Desarrollador'] || '';
 
-            // LÓGICA DE DIBUJO DEPENDIENDO DE LA PESTAÑA
             if (isAppianTab) {
-                // RENDERIZADO CLÁSICO PARA APPIAN
                 bar.innerHTML = `
                     <span class="project-title">${projName}</span>
                     <div class="badges">
@@ -262,7 +258,6 @@ function renderProjects() {
                     </div>
                 `;
             } else {
-                // RENDERIZADO AVANZADO (BURBUJAS) PARA AUTOMATION IA
                 const appRaw = project['Aplicativo'] ? project['Aplicativo'].toString().toLowerCase() : '';
                 let appBubbles = '';
                 if (appRaw.includes('dapta')) appBubbles += `<div class="bubble app-bubble"><img src="assets/dapta-logo.png" title="Dapta"></div>`;
@@ -274,7 +269,7 @@ function renderProjects() {
                 let devBubble = '';
                 if (devName && devName.toLowerCase() !== 'n/a') {
                     const initial = devName.charAt(0).toUpperCase();
-                    const shortName = devName.split(' ')[0]; // Solo el primer nombre
+                    const shortName = devName.split(' ')[0]; 
                     devBubble = `
                         <div class="bubble dev-bubble">
                             <span class="dev-initial">${initial}</span>
@@ -283,11 +278,12 @@ function renderProjects() {
                     `;
                 }
 
+                // EL NUEVO ORDEN: Estado -> Apps -> Desarrollador
                 bar.innerHTML = `
                     <span class="project-title">${projName}</span>
                     <div class="floating-bubbles">
-                        ${appBubbles}
                         ${statusBubble}
+                        ${appBubbles}
                         ${devBubble}
                     </div>
                 `;
