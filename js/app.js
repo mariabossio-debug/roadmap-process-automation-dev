@@ -125,7 +125,7 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
-// APLANADORA DE HORAS (Precisión perfecta)
+// APLANADORA DE HORAS
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
     const str = dateValue.toString().trim();
@@ -182,6 +182,9 @@ function renderProjects() {
 
     if (!data || data.length === 0) return;
 
+    // Detectamos en qué pestaña estamos para aplicar una visual u otra
+    const isAppianTab = currentTab === 'appian';
+
     let filteredData = data.filter(p => {
         const tabCategory = p['Frente de trabajo'] || p['Frente'] || p['Plataforma'] || p['Equipo'];
         const matchesTab = tabCategory && tabCategory.toString().toLowerCase().trim() === currentTab;
@@ -205,7 +208,7 @@ function renderProjects() {
     const rowEndPositions = [];
     const containerWidth = scrollArea.offsetWidth || 3800; 
     
-    // Espacio vertical para alojar las barras gorditas (42px) + burbujas flotantes en el borde superior (-10px)
+    // Espacio vertical
     const rowSpacing = 56; 
 
     filteredData.forEach(project => {
@@ -239,50 +242,59 @@ function renderProjects() {
             const projName = project['Nombre del proyecto'] || 'Sin nombre';
             bar.setAttribute('title', `Proyecto: ${projName}\nÁrea: ${rawArea}\nEstado: ${project['Estado'] || 'No definido'}`);
 
-            // 1. BURBUJAS DE APLICATIVO (Dapta, n8n, Boost)
-            const appRaw = project['Aplicativo'] ? project['Aplicativo'].toString().toLowerCase() : '';
-            let appBubbles = '';
-            if (appRaw.includes('dapta')) appBubbles += `<div class="bubble"><img src="assets/dapta-logo.png" title="Dapta"></div>`;
-            if (appRaw.includes('n8n')) appBubbles += `<div class="bubble"><img src="assets/n8n-logo.png" title="n8n"></div>`;
-            if (appRaw.includes('boost')) appBubbles += `<div class="bubble"><img src="assets/boost-logo.png" title="Boost AI"></div>`;
-
-            // 2. BURBUJA DE ESTADO
             const statusKey = normalizeText(project['Estado']);
             let iconHtml = '';
             if (statusKey === 'dev') iconHtml = `<img src="assets/dev.png" class="status-icon">`;
             else if (statusKey === 'test') iconHtml = `<img src="assets/test.png" class="status-icon">`;
             else if (statusKey === 'prod') iconHtml = `<img src="assets/prod.png" class="status-icon">`;
             else if (statusKey === 'piloto') iconHtml = `<img src="assets/piloto1.png" class="status-icon piloto-icon">`;
-            
-            let statusBubble = iconHtml ? `<div class="bubble">${iconHtml}</div>` : '';
 
-            // 3. BURBUJA DEL DESARROLLADOR (Inicial + Tooltip Hover)
             const devName = project['Desarrollador'] || '';
-            let devBubble = '';
-            if (devName && devName.toLowerCase() !== 'n/a') {
-                const initial = devName.charAt(0).toUpperCase();
-                const shortName = devName.split(' ')[0]; // Tomamos el primer nombre para el tooltip
-                devBubble = `
-                    <div class="bubble dev-bubble">
-                        <span class="dev-initial">${initial}</span>
-                        <span class="dev-full">${shortName}</span>
+
+            // LÓGICA DE DIBUJO DEPENDIENDO DE LA PESTAÑA
+            if (isAppianTab) {
+                // RENDERIZADO CLÁSICO PARA APPIAN
+                bar.innerHTML = `
+                    <span class="project-title">${projName}</span>
+                    <div class="badges">
+                        ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
+                        ${iconHtml}
+                    </div>
+                `;
+            } else {
+                // RENDERIZADO AVANZADO (BURBUJAS) PARA AUTOMATION IA
+                const appRaw = project['Aplicativo'] ? project['Aplicativo'].toString().toLowerCase() : '';
+                let appBubbles = '';
+                if (appRaw.includes('dapta')) appBubbles += `<div class="bubble app-bubble"><img src="assets/dapta-logo.png" title="Dapta"></div>`;
+                if (appRaw.includes('n8n')) appBubbles += `<div class="bubble app-bubble"><img src="assets/n8n-logo.png" title="n8n"></div>`;
+                if (appRaw.includes('boost')) appBubbles += `<div class="bubble app-bubble"><img src="assets/boost-logo.png" title="Boost AI"></div>`;
+
+                let statusBubble = iconHtml ? `<div class="bubble">${iconHtml}</div>` : '';
+
+                let devBubble = '';
+                if (devName && devName.toLowerCase() !== 'n/a') {
+                    const initial = devName.charAt(0).toUpperCase();
+                    const shortName = devName.split(' ')[0]; // Solo el primer nombre
+                    devBubble = `
+                        <div class="bubble dev-bubble">
+                            <span class="dev-initial">${initial}</span>
+                            <span class="dev-full">${shortName}</span>
+                        </div>
+                    `;
+                }
+
+                bar.innerHTML = `
+                    <span class="project-title">${projName}</span>
+                    <div class="floating-bubbles">
+                        ${appBubbles}
+                        ${statusBubble}
+                        ${devBubble}
                     </div>
                 `;
             }
-
-            // ARMAMOS EL HTML DE LA BARRA
-            bar.innerHTML = `
-                <span class="project-title">${projName}</span>
-                <div class="floating-bubbles">
-                    ${appBubbles}
-                    ${statusBubble}
-                    ${devBubble}
-                </div>
-            `;
             
             container.appendChild(bar);
 
-            // CÁLCULO DE COLISIÓN (Toma en cuenta el ancho real de la barra, que por CSS tiene un min-width para que el texto siempre se lea)
             const actualWidthPx = bar.getBoundingClientRect().width || bar.offsetWidth;
             const visualWidthPct = (actualWidthPx / containerWidth) * 100;
             const visualRightPos = displayLeft + visualWidthPct;
