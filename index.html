@@ -3,42 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap Process Automation</title>
+    <title>Bold Roadmap Process Automation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <link rel="icon" type="image/png" href="assets/logo-blanco-ball.png">
-    
-
-<link rel="stylesheet" href="css/style.css?v=12">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
     <header class="top-header">
         <div class="page-header">
-            <img src="https://bold-process-automation.github.io/assets-project-graphic-design/bold-logo-palabra-blanco.png" alt="Logo Bold">
+            <img src="assets/logo-blanco-ball.png" alt="Bold Logo">
             <h1>Roadmap Process Automation</h1>
         </div>
     </header>
 
-    <div class="main-container">
+    <main class="main-container">
         
-       <div class="controls-header">
+        <div class="controls-header">
             
             <div class="left-controls">
                 
-                <div class="tabs-container" style="display: flex; flex-direction: column; gap: 8px;">
-                    <div class="tabs">
-                        <button class="tab active" id="tab-appian" onclick="switchMainTab('appian')">Appian</button>
-                        <button class="tab" id="tab-automation" onclick="switchMainTab('automation')">Automation IA</button>
-                    </div>
-                    
-                    <div class="sub-tabs" id="sub-tabs-automation" style="display: none;">
-                        <button class="sub-tab active" id="sub-tab-automation-ia" onclick="switchSubTab('automation ia')">Roadmap IA</button>
-                        <button class="sub-tab" id="sub-tab-wsnh" onclick="switchSubTab('wsnh')">Campaña WSNH</button>
-                    </div>
+                <div class="tabs-container">
+                    <button class="tab active" id="tab-appian" onclick="switchTab('appian')">Appian</button>
+                    <button class="tab" id="tab-automation" onclick="switchTab('automation')">Automation IA</button>
                 </div>
 
                 <div class="status-legend">
@@ -95,21 +82,35 @@
 
         <div class="timeline-wrapper">
             <div class="timeline-scroll-area" id="mainScrollArea">
-                <div class="quarters-header" id="quarters-header"></div>
-                <div class="months-header" id="months-header"></div>
-                <div class="weeks-header" id="weeks-header"></div>
-                <div class="grid-lines" id="grid-lines"></div>
-                <div class="projects-area" id="projects-container"></div>
-                <div id="today-marker" class="today-line" style="display: none;">
-                    <div class="today-label">Hoy</div>
+                
+                <div class="quarters-header" id="quarters-header">
+                    </div>
+
+                <div class="months-header" id="months-header">
+                    </div>
+
+                <div class="weeks-header" id="weeks-header">
+                    </div>
+
+                <div class="grid-lines" id="grid-lines">
+                    </div>
+
+                <div class="projects-area" id="projects-container">
+                    </div>
+
+                <div class="today-line" id="today-marker">
+                    <span class="today-label">HOY</span>
                 </div>
             </div>
         </div>
-    </div> 
 
-    <div id="sync-toast" class="sync-toast"></div>
+        <div class="sync-toast" id="sync-toast">
+            <div class="spinner-small"></div>
+            Sincronizando Sheets...
+        </div>
+
+    </main>
 
     <script src="js/app.js"></script>
-
 </body>
 </html>
