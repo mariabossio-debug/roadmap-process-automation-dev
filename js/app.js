@@ -3,7 +3,11 @@ const sheetApiUrl = 'https://script.google.com/macros/s/AKfycbynd7JOqdCceaBVf_AE
 const wStart = new Date(2026, 0, 1, 0, 0, 0);
 const totalDays = 365; 
 
-let currentTab = 'appian'; 
+// ESTADO INICIAL DEL SISTEMA DE PESTAÑAS (Padres e Hijas)
+let currentMainTab = 'appian';       // Pestaña principal activa ('appian' o 'automation')
+let currentSubTab = 'automation ia'; // Sub-pestaña activa ('automation ia' o 'wsnh')
+let currentTab = 'appian';           // El valor real que usa el filtro de búsqueda
+
 let data = []; 
 let selectedAreas = []; 
 
@@ -125,18 +129,19 @@ function renderCalendarHeaders() {
     document.getElementById('grid-lines').innerHTML = htmlGrid;
 }
 
+// APLANADORA DE HORAS
 function parseDateSafe(dateValue) {
     if (!dateValue) return null;
     const str = dateValue.toString().trim();
     const isoMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})T/);
-    if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3]); 
+    if (isoMatch) return new Date(isoMatch[1], isoMatch[2] - 1, isoMatch[3], 0, 0, 0); 
     const parts = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
-    if (parts) return new Date(parts[3], parts[2] - 1, parts[1]);
+    if (parts) return new Date(parts[3], parts[2] - 1, parts[1], 0, 0, 0);
     const ymdMatch = str.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (ymdMatch) return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3]);
+    if (ymdMatch) return new Date(ymdMatch[1], ymdMatch[2] - 1, ymdMatch[3], 0, 0, 0);
     const temp = new Date(str);
     if (isNaN(temp.getTime())) return null;
-    return temp;
+    return new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
 }
 
 function getTimelinePosition(dateValue) {
@@ -146,16 +151,25 @@ function getTimelinePosition(dateValue) {
 }
 
 function renderTodayLine() {
-    const todayLine = document.getElementById('today-marker');
-    todayLine.style.left = `${getTimelinePosition(new Date())}%`;
+    const today = new Date(); 
+    const flatToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+    const todayPercentage = ((flatToday.getTime() - wStart.getTime()) / (1000 * 60 * 60 * 24) / totalDays) * 100; 
+    const todayMarker = document.getElementById('today-marker');
+    if (todayPercentage >= 0 && todayPercentage <= 100) {
+        todayMarker.style.left = `${todayPercentage}%`;
+        todayMarker.style.display = 'block';
+    } else {
+        todayMarker.style.display = 'none';
+    }
 }
 
 function scrollToToday() {
     const wrapper = document.querySelector('.timeline-wrapper');
     const scrollArea = document.querySelector('.timeline-scroll-area');
-    const todayLine = document.getElementById('today-marker');
-    if (!wrapper || !scrollArea || !todayLine) return;
-    wrapper.scrollTo({ left: todayLine.offsetLeft - (wrapper.offsetWidth / 2), behavior: 'smooth' });
+    if (!wrapper || !scrollArea) return;
+    const scrollWidth = scrollArea.offsetWidth;
+    const todayPosition = (((new Date() - wStart) / (1000 * 60 * 60 * 24)) / 365) * scrollWidth;
+    wrapper.scrollTo({ left: Math.max(0, todayPosition - (wrapper.offsetWidth / 2)), behavior: 'smooth' });
 }
 
 function toggleViewMode() {
@@ -165,9 +179,6 @@ function toggleViewMode() {
     setTimeout(() => { renderProjects(); scrollToToday(); }, 300);
 }
 
-// =========================================================================
-// RENDERIZADO DE PROYECTOS (Integrando Assets de Dapta, Boost, n8n)
-// =========================================================================
 function renderProjects() {
     const container = document.getElementById('projects-container');
     const scrollArea = document.getElementById('mainScrollArea');
@@ -175,9 +186,12 @@ function renderProjects() {
 
     if (!data || data.length === 0) return;
 
+    // Detectamos si usamos Appian o si usamos el sistema de Burbujas (Automation/WSNH)
+    const isAppianStyle = currentMainTab === 'appian';
+
     let filteredData = data.filter(p => {
-        const tabCategory = p['Frente de trabajo'] || p['Frente'];
-        const matchesTab = tabCategory && normalizeText(tabCategory) === currentTab;
+        const tabCategory = p['Frente de trabajo'] || p['Frente'] || p['Plataforma'] || p['Equipo'];
+        const matchesTab = tabCategory && tabCategory.toString().toLowerCase().trim() === currentTab;
         const areaValue = p['Área'] ? normalizeText(p['Área']) : 'default';
         const matchesArea = selectedAreas.length === 0 || selectedAreas.includes(areaValue);
         return matchesTab && matchesArea;
@@ -186,11 +200,17 @@ function renderProjects() {
     filteredData.sort((a, b) => {
         const dateA = parseDateSafe(a['Fecha de Inicio'])?.getTime() || 0;
         const dateB = parseDateSafe(b['Fecha de Inicio'])?.getTime() || 0;
-        return dateA - dateB || normalizeText(a['Área']).localeCompare(normalizeText(b['Área']));
+        if (dateA !== dateB) return dateA - dateB;
+        const areaA = normalizeText(a['Área']);
+        const areaB = normalizeText(b['Área']);
+        if (areaA !== areaB) return areaA.localeCompare(areaB);
+        const endA = parseDateSafe(a['Fecha de Fin'])?.getTime() || 0;
+        const endB = parseDateSafe(b['Fecha de Fin'])?.getTime() || 0;
+        return endB - endA; 
     });
 
     const rowEndPositions = [];
-    const containerWidth = scrollArea.offsetWidth; 
+    const containerWidth = scrollArea.offsetWidth || 3800; 
     const rowSpacing = 56; 
 
     filteredData.forEach(project => {
@@ -209,8 +229,11 @@ function renderProjects() {
             bar.setAttribute('data-area', areaKey);
             
             const displayLeft = Math.max(0, leftPos);
+            let dateWidthPct = rightPos - leftPos;
+            const displayWidthPct = Math.min(dateWidthPct - (displayLeft - leftPos), 100 - displayLeft);
+
             bar.style.left = `${displayLeft}%`;
-            bar.style.width = `${Math.min(rightPos - leftPos - (displayLeft - leftPos), 100 - displayLeft)}%`;
+            bar.style.width = `${displayWidthPct}%`;
             
             if (areaKey === 'default') {
                 bar.style.background = `var(--area-default)`;
@@ -230,27 +253,52 @@ function renderProjects() {
 
             const devName = project['Desarrollador'] || '';
 
-            // =============================================================
-            // INTEGRAMOS LOGOS DINÁMICOS EN EL NOMBRE DEL PROYECTO
-            // =============================================================
-            const appRaw = project['Aplicativo'] ? project['Aplicativo'].toString().toLowerCase() : '';
-            let appLogos = '';
-            // Si el texto del proyecto contiene 'Dapta', 'Boost' o 'n8n', añadimos el logo correspondiente
-            if (projName.toLowerCase().includes('dapta')) appLogos += `<img src="assets/dapta-logo.png" class="status-icon">`;
-            if (projName.toLowerCase().includes('boost')) appLogos += `<img src="assets/boost-logo.png" class="status-icon">`;
-            if (projName.toLowerCase().includes('n8n')) appLogos += `<img src="assets/n8n-logo.png" class="status-icon">`;
+            if (isAppianStyle) {
+                // RENDERIZADO APPIAN (Clásico)
+                bar.innerHTML = `
+                    <span class="project-title">${projName}</span>
+                    <div class="badges">
+                        ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
+                        ${iconHtml}
+                    </div>
+                `;
+            } else {
+                // RENDERIZADO AUTOMATION IA & WSNH (Burbujas Flotantes Avanzadas)
+                const appRaw = project['Aplicativo'] ? project['Aplicativo'].toString().toLowerCase() : '';
+                let appBubbles = '';
+                if (appRaw.includes('dapta')) appBubbles += `<div class="bubble app-bubble"><img src="assets/dapta-logo.png" title="Dapta"></div>`;
+                if (appRaw.includes('n8n')) appBubbles += `<div class="bubble app-bubble"><img src="assets/n8n-logo.png" title="n8n"></div>`;
+                if (appRaw.includes('boost')) appBubbles += `<div class="bubble app-bubble"><img src="assets/boost-logo.png" title="Boost AI"></div>`;
 
-            bar.innerHTML = `
-                <span class="project-title">${appLogos}${projName}</span>
-                <div class="badges">
-                    ${devName && devName.toLowerCase() !== 'n/a' ? `<span class="badge">${devName}</span>` : ''}
-                    ${iconHtml}
-                </div>
-            `;
+                let statusBubble = iconHtml ? `<div class="bubble">${iconHtml}</div>` : '';
+
+                let devBubble = '';
+                if (devName && devName.toLowerCase() !== 'n/a') {
+                    const initial = devName.charAt(0).toUpperCase();
+                    const shortName = devName.split(' ')[0]; 
+                    devBubble = `
+                        <div class="bubble dev-bubble">
+                            <span class="dev-initial">${initial}</span>
+                            <span class="dev-full">${shortName}</span>
+                        </div>
+                    `;
+                }
+
+                // EL ORDEN ESTRICTO QUE PEDISTE: Estado -> Aplicativos -> Desarrollador
+                bar.innerHTML = `
+                    <span class="project-title">${projName}</span>
+                    <div class="floating-bubbles">
+                        ${statusBubble}
+                        ${appBubbles}
+                        ${devBubble}
+                    </div>
+                `;
+            }
             
             container.appendChild(bar);
 
-            const visualWidthPct = (bar.offsetWidth / containerWidth) * 100;
+            const actualWidthPx = bar.getBoundingClientRect().width || bar.offsetWidth;
+            const visualWidthPct = (actualWidthPx / containerWidth) * 100;
             const visualRightPos = displayLeft + visualWidthPct;
 
             let currentRow = 0;
@@ -266,25 +314,57 @@ function renderProjects() {
     container.style.height = `${rowEndPositions.length * rowSpacing + 80}px`;
 }
 
-function switchTab(tab) {
-    currentTab = tab;
+// =========================================================================
+// NUEVO SISTEMA DE CONTROL DE PESTAÑAS (PADRES E HIJAS)
+// =========================================================================
+function switchMainTab(tab) {
+    currentMainTab = tab;
+    // Actualiza colores de los botones principales
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
+
+    // Muestra u oculta el menú de sub-pestañas
+    if (tab === 'automation') {
+        document.getElementById('sub-tabs-automation').style.display = 'flex';
+        currentTab = currentSubTab; // Filtra usando la sub-pestaña activa (ej. 'wsnh')
+    } else {
+        document.getElementById('sub-tabs-automation').style.display = 'none';
+        currentTab = 'appian'; // Filtra por 'appian'
+    }
+    renderProjects();
+}
+
+function switchSubTab(subtab) {
+    currentSubTab = subtab;
+    currentTab = subtab; // Este es el value real que filtra en Sheets
+
+    // Actualiza colores de las sub-pestañas
+    document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('sub-tab-' + subtab.replace(/\s+/g, '-')).classList.add('active');
+    
     renderProjects();
 }
 
 async function loadDataAndRender() {
     renderCalendarHeaders(); 
 
+    const container = document.getElementById('projects-container');
+    const syncToast = document.getElementById('sync-toast');
     const cachedData = sessionStorage.getItem('boldRoadmapData');
+
     if (cachedData) {
-        data = JSON.parse(cachedData);
-        populateFilterDropdown(); 
-        renderProjects();
-        setTimeout(scrollToToday, 100);
-        renderTodayLine();
+        try {
+            data = JSON.parse(cachedData);
+            populateFilterDropdown(); 
+            renderProjects();
+            setTimeout(scrollToToday, 100);
+            renderTodayLine();
+            
+            syncToast.innerHTML = `<div class="spinner-small"></div> Sincronizando Sheets...`;
+            syncToast.classList.add('show');
+        } catch(e) { console.error("Error leyendo caché", e); }
     } else {
-        document.getElementById('projects-container').innerHTML = `<div class="loader-container"><div class="spinner-large"></div><span>Conectando con Google Sheets...</span></div>`;
+        container.innerHTML = `<div class="loader-container"><div class="spinner-large"></div><span>Conectando con Google Sheets...</span></div>`;
     }
 
     try {
@@ -296,13 +376,21 @@ async function loadDataAndRender() {
         populateFilterDropdown(); 
         renderProjects();
         renderTodayLine();
-        if (!cachedData) setTimeout(scrollToToday, 100);
-
+        
+        if (!cachedData) {
+            setTimeout(scrollToToday, 100);
+        } else {
+            syncToast.innerHTML = `✅ ¡Actualizado!`;
+            setTimeout(() => syncToast.classList.remove('show'), 2500);
+        }
     } catch (error) {
         console.error("Error sincronizando", error);
-        document.getElementById('sync-toast').innerHTML = `⚠️ No se pudo sincronizar`;
-        document.getElementById('sync-toast').classList.add('show');
-        setTimeout(() => document.getElementById('sync-toast').classList.remove('show'), 3000);
+        if (!cachedData) {
+            container.innerHTML = `<div class="loader-container" style="color:red;"><span>Error de red. Por favor recarga (F5).</span></div>`;
+        } else {
+            syncToast.innerHTML = `⚠️ No se pudo sincronizar`;
+            setTimeout(() => syncToast.classList.remove('show'), 3000);
+        }
     }
 }
 
