@@ -323,13 +323,17 @@ function switchMainTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
 
-    // Muestra u oculta el menú de sub-pestañas
+    const scrollArea = document.getElementById('mainScrollArea');
+
+    // Muestra u oculta el menú de sub-pestañas y aplica la optimización de ancho
     if (tab === 'automation') {
         document.getElementById('sub-tabs-automation').style.display = 'flex';
-        currentTab = currentSubTab; // Filtra usando la sub-pestaña activa (ej. 'wsnh')
+        currentTab = currentSubTab; // Filtra usando la sub-pestaña activa
+        scrollArea.classList.remove('appian-view'); // Desactiva ancho 100% para mantener scroll en IA
     } else {
         document.getElementById('sub-tabs-automation').style.display = 'none';
         currentTab = 'appian'; // Filtra por 'appian'
+        scrollArea.classList.add('appian-view'); // Activa ancho 100% para reducir scroll horizontal
     }
     renderProjects();
 }
