@@ -1,17 +1,15 @@
 :root {
-    /* COLORES CORE BOLD */
     --bold-coral: #FF2847; /* Re-integrado para acentos creativos */
     --bold-azul: #121E6C;
     --bold-azul-vibrante: #080EFF;
     --bold-blanco: #FFFFFF;
     
-    /* COLORES PREMIUM SAAS (Estilo Flat Appian con acentos Bold) */
     --bg-page: #FFFFFF; 
     --text-muted: #64748B; 
     --border-soft: #E2E8F0; 
     --shadow-premium: 0 4px 12px rgba(18, 30, 108, 0.04); 
 
-    /* Paleta de Áreas (Mantenemos la moderna) */
+    /* Paleta de Áreas */
     --area-risk: #610017; --area-financial: #C31A2F; --area-sales: #0A53A5;
     --area-human-talent: #1B8959; --area-legal-y-cumplimiento: #FFC217; --area-cs: #0B3B26;
     --area-logistica: #052D65; --area-hubs: #910022; --area-marketing: #227AD1;
@@ -26,7 +24,6 @@
 html, body {
     height: 100%; 
     background-color: var(--bg-page);
-    /* Aseguramos que nada se salga del body para el overflow */
     overflow-x: hidden;
 }
 
@@ -39,9 +36,6 @@ body {
     background: var(--bg-page); 
 }
 
-/* ==========================================================================
-   HEADER FLAT Y LIMPIO
-   ========================================================================== */
 .top-header { 
     width: 100%; 
     height: 100px; 
@@ -52,35 +46,26 @@ body {
     box-shadow: none; 
 }
 .page-header { display: flex; align-items: center; gap: 20px; }
-
-.page-header img { 
-    height: 40px; 
-    filter: brightness(0) saturate(100%) invert(12%) sepia(35%) saturate(5412%) hue-rotate(227deg) brightness(90%) contrast(106%); 
-} 
-
+.page-header img { height: 40px; filter: brightness(0) saturate(100%) invert(12%) sepia(35%) saturate(5412%) hue-rotate(227deg) brightness(90%) contrast(106%); } 
 .page-header h1 { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 26px; margin: 0; color: var(--bold-azul); text-shadow: none; }
 
 .main-container { padding: 15px 20px; max-width: 100%; margin: 0 auto;} 
 
-/* ==========================================================================
-   CONTROLES MINIMALISTAS CON ACENTOS CORAL
-   ========================================================================== */
+/* CONTROLES MINIMALISTAS */
 .controls-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
 .left-controls { display: flex; align-items: flex-start; gap: 20px; flex-wrap: wrap; }
 .right-controls { display: flex; align-items: flex-start; gap: 15px; flex-wrap: wrap; }
 
-/* TABS */
 .tabs { background: #F1F5F9; padding: 4px; border-radius: 8px; display: inline-flex; gap: 0; border: 1px solid var(--border-soft); }
 .tab { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 13px; padding: 8px 20px; cursor: pointer; border-radius: 6px; background: transparent; color: var(--text-muted); border: none; transition: all 0.2s ease; }
-.tab:hover { color: var(--bold-azul); border: 1px solid var(--bold-coral); /* ACENTO CORAL SUTIL AL HOVER */ }
+.tab:hover { color: var(--bold-azul); } /* ELIMINADO EL RECUADRO CORAL */
 .tab.active { background: var(--bold-azul); color: var(--bold-blanco); box-shadow: none; } 
 
 .sub-tabs { display: flex; gap: 8px; margin-top: 8px; margin-left: 5px; animation: fadeIn 0.3s ease; }
 .sub-tab { font-family: 'Montserrat', sans-serif; font-weight: 600; padding: 6px 16px; font-size: 11px; cursor: pointer; border-radius: 20px; background: transparent; border: 1px solid var(--border-soft); color: var(--text-muted); transition: all 0.2s ease; }
-.sub-tab:hover { border-color: var(--bold-coral); color: var(--bold-azul); /* ACENTO CORAL SUTIL AL HOVER */ }
+.sub-tab:hover { border-color: var(--bold-azul); color: var(--bold-azul); } /* ELIMINADO EL RECUADRO CORAL */
 .sub-tab.active { background: #F1F5F9; border-color: var(--bold-azul); color: var(--bold-azul); font-weight: 700; }
 
-/* CAJAS (Estados, Filtros, Toggle) */
 .status-legend, .filter-btn, .view-toggle { 
     display: flex; align-items: center; 
     background: var(--bold-blanco); 
@@ -98,7 +83,7 @@ body {
 
 .custom-filter { position: relative; font-family: 'Montserrat', sans-serif; }
 .filter-btn { padding: 0 16px; gap: 8px; cursor: pointer; transition: all 0.2s ease; font-family: 'Montserrat', sans-serif; }
-.filter-btn:hover { border-color: var(--bold-coral); /* ACENTO CORAL AL HOVER */ }
+.filter-btn:hover { border-color: var(--bold-azul); } /* ELIMINADO EL RECUADRO CORAL */
 .filter-btn::after { content: '▼'; font-size: 10px; opacity: 0.6; }
 
 .filter-panel { 
@@ -112,21 +97,21 @@ body {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 .fp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .fp-title { font-size: 13px; color: var(--bold-azul); font-weight: 700; }
-.fp-clear { font-size: 12px; color: var(--bold-coral); cursor: pointer; font-weight: 600; text-decoration: underline; /* ACENTO CORAL */ } 
+.fp-clear { font-size: 12px; color: var(--bold-azul); cursor: pointer; font-weight: 600; text-decoration: underline; } 
 .fp-search-box { margin-bottom: 10px; }
 .fp-search-box input { width: 100%; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--border-soft); font-family: 'Montserrat', sans-serif; font-size: 12px; box-sizing: border-box; outline: none; }
-.fp-search-box input:focus { border-color: var(--bold-coral); /* ACENTO CORAL AL FOCO */ }
+.fp-search-box input:focus { border-color: var(--bold-azul); }
 .fp-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--border-soft); margin-bottom: 10px; }
 .fp-list label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--bold-azul); cursor: pointer; font-weight: 500; font-family: 'Montserrat', sans-serif;}
 
-/* ACENTO CORAL EN CHECKBOXES */
+/* AQUÍ MANTENEMOS TU ACENTO CORAL CREATIVO */
 .fp-list input[type="checkbox"] { accent-color: var(--bold-coral); cursor: pointer; width: 14px; height: 14px; margin: 0;} 
 
 .fp-select-all { padding-bottom: 8px; border-bottom: 1px solid var(--border-soft); margin-bottom: 8px; font-family: 'Montserrat', sans-serif;}
 .fp-actions { display: flex; gap: 10px; }
 .fp-btn-ok { flex: 1; background: var(--bold-azul); color: white; border: none; padding: 10px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif;}
 .fp-btn-cancel { flex: 1; background: #F1F5F9; color: var(--bold-azul); border: none; padding: 10px; border-radius: 4px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif;}
-.fp-btn-cancel:hover { border: 1px solid var(--bold-coral); }
+.fp-btn-cancel:hover { border: 1px solid var(--bold-azul); }
 
 .view-toggle { padding: 0 16px; gap: 12px; font-family: 'Montserrat', sans-serif; }
 #label-semanas { font-weight: 700; opacity: 1; transition: 0.3s; }
@@ -139,12 +124,12 @@ body {
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #CBD5E1; transition: .4s; border-radius: 34px; }
 .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.15);}
 
-/* ACENTO CORAL EN EL TOGGLE ACTIVO */
+/* AQUÍ MANTENEMOS TU ACENTO CORAL CREATIVO */
 input:checked + .slider { background-color: var(--bold-coral); } 
 input:checked + .slider:before { transform: translateX(20px); }
 
 /* ==========================================================================
-   EL CALENDARIO (ESTILO FLAT APPIAN & OPTIMIZADO CON ANIMACIONES)
+   EL CALENDARIO (ESTILO FLAT APPIAN & RESPONSIVE FIX)
    ========================================================================== */
 .timeline-wrapper { 
     background: var(--bold-blanco); 
@@ -154,7 +139,6 @@ input:checked + .slider:before { transform: translateX(20px); }
     overflow-x: auto; 
     overflow-y: hidden; 
     box-shadow: var(--shadow-premium); 
-    /* Aseguramos que nada se salga del calendario para el overflow */
     position: relative;
     width: 100%;
 }
@@ -168,25 +152,26 @@ input:checked + .slider:before { transform: translateX(20px); }
     position: relative; 
     display: flex; 
     flex-direction: column; 
-    /* Base semanas (ancho original para Automation IA) */
-    min-width: 3800px; 
-    /* ANIMACIÓN FLUIDA DEL TOGGLE EN APPIAN */
-    transition: min-width 0.4s ease-out, transform 0.4s ease-out; 
-    will-change: min-width, transform; 
+    /* Automation IA (Semanas): Necesita mucho espacio para "Semana 1" */
+    min-width: max(100%, 2800px); 
+    transition: min-width 0.4s ease-out; 
+    will-change: min-width; 
 }
 
-/* VISTA APPIAN: Ancho fluido al 100% para evitar Scroll en la pestaña Appian (cuando toggle está en semanas) */
-.timeline-scroll-area.appian-view { min-width: 100%; }
+/* FIX RESPONSIVE APPIAN: El 100% destruye pantallas chicas. Usamos un max() para proteger la UI */
+.timeline-scroll-area.appian-view { 
+    min-width: max(100%, 1600px); /* Garantiza que los textos S1, S2 y los proyectos jamás se amontonen */
+}
 
-/* VISTA MESES: Ancho compacto para Automation IA */
-.timeline-scroll-area.monthly-view { min-width: 1400px; }
+/* Automation IA (Meses) */
+.timeline-scroll-area.monthly-view { 
+    min-width: max(100%, 1200px); 
+}
 
-/* VISTA MESES EN APPIAN: Cuando el toggle se activa, forzamos ancho fluido al 100% y animamos la compresión */
+/* Appian (Meses) */
 .timeline-scroll-area.monthly-view.appian-view { 
-    min-width: 100%; 
-    animation: compressCalendar 0.4s ease-out; /* Animación de compresión */
+    min-width: max(100%, 1000px); 
 } 
-@keyframes compressCalendar { from { min-width: 100%; } to { min-width: 100%; } }
 
 .timeline-scroll-area.monthly-view .weeks-header { display: none; }
 .timeline-scroll-area.monthly-view .grid-week { border-right-color: transparent; }
@@ -227,7 +212,7 @@ input:checked + .slider:before { transform: translateX(20px); }
     font-family: 'Montserrat', sans-serif;
 }
 
-/* ARREGLO DEL LAYOUT DE SEMANAS (TIPOGRAFÍA UNIFICADA EN UNA LÍNEA) */
+/* S1 y Semana 1 alineados perfectamente al centro */
 .weeks-header { 
     display: flex; 
     background: #F8FAFC; 
@@ -242,11 +227,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-right: 1px dashed var(--border-soft); 
     box-sizing: border-box; 
     font-family: 'Montserrat', sans-serif;
-    /* Forzamos tipografía en una línea */
     display: flex; align-items: center; justify-content: center;
 }
 
-/* LÍNEAS DIVISORIAS ALTA VISIBILIDAD */
+/* LÍNEAS DIVISORIAS ESTÉTICAS (Gris sofisticado en lugar de azul agresivo) */
 .grid-lines { position: absolute; top: 85px; bottom: 0; left: 0; right: 0; display: flex; z-index: 0; pointer-events: none; }
 
 .grid-month-container { 
@@ -256,8 +240,8 @@ input:checked + .slider:before { transform: translateX(20px); }
     height: 100%;
 }
 
-/* LÍNEA TRIMESTRAL NOTORIA PARA PROYECTORES */
-.grid-month-container:nth-child(3n) { border-right: 3px solid var(--bold-azul); }
+/* DIVISOR DE TRIMESTRES (Q): Ahora es un gris elegante (Slate 400), notorio pero no ordinario */
+.grid-month-container:nth-child(3n) { border-right: 2px solid #94A3B8; }
 .grid-month-container:last-child { border-right: none; }
 
 .grid-week { flex: 1; border-right: 1px dashed #F1F5F9; box-sizing: border-box; height: 100%; transition: border-color 0.3s ease;}
@@ -265,19 +249,19 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .projects-area { position: relative; margin-top: 40px; padding-bottom: 60px; min-height: 300px; z-index: 1; }
 
+/* FIX DE LAS BURBUJAS CORTADAS Y TEXTO SOBRESALIENTE */
 .project-bar { 
     position: absolute; height: 42px; border-radius: 6px; display: flex; align-items: center; 
-    padding: 0 16px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box; 
+    padding: 0 12px; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); box-sizing: border-box; 
     min-width: 140px; transition: transform 0.2s ease, box-shadow 0.2s ease; 
-    /* FIX DE OVERFLOW: Asegurar que etiquetas largas se corten al final del calendario */
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    /* ¡NO usar overflow: hidden aquí para que las burbujas puedan salir! */
 }
 .project-bar:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); z-index: 100 !important; cursor: default; }
 
 .project-title { 
     white-space: nowrap; line-height: 1.1; font-size: 11.5px; font-weight: 600;
     flex-grow: 1; padding-right: 10px; font-family: 'Montserrat', sans-serif;
-    /* Asegurar que etiquetas largas se corten */
+    /* El texto SÍ se corta si no cabe, pero sin dañar las burbujas flotantes */
     overflow: hidden; text-overflow: ellipsis;
 }
 
@@ -305,16 +289,15 @@ input:checked + .slider:before { transform: translateX(20px); }
 .dev-bubble:hover .dev-initial { opacity: 0; }
 .dev-bubble:hover .dev-full { opacity: 1; }
 
-/* HOY (ETIQUETA FLOTANTE CORAL RE-INTEGRADA) */
+/* HOY (ETIQUETA FLOTANTE CORAL) */
 .today-line { position: absolute; top: 0; bottom: 0; width: 2px; background-color: var(--bold-coral); z-index: 20; pointer-events: none; box-shadow: none;}
 .today-label { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: var(--bold-coral); color: white; padding: 6px 18px; border-radius: 6px; font-size: 11px; font-weight: 700; font-family: 'Montserrat', sans-serif; box-shadow: none; text-transform: uppercase; letter-spacing: 1px;}
 
 /* Sincronización */
 .sync-toast { position: fixed; bottom: 30px; right: 30px; background-color: var(--bold-azul); color: white; padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: 'Montserrat', sans-serif; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 15px rgba(18, 30, 108, 0.15); z-index: 9999; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; pointer-events: none; }
-.sync-toast:hover { border: 1px solid var(--bold-coral); }
 .sync-toast.show { opacity: 1; transform: translateY(0); }
 .spinner-small { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top: 2px solid white; border-radius: 50%; animation: spin 1s linear infinite; }
 
 .loader-container { position: absolute; top: 120px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 15px; color: var(--bold-azul); font-weight: 600; font-family: 'Montserrat', sans-serif;}
-.spinner-large { width: 40px; height: 40px; border: 4px solid var(--border-soft); border-top: 4px solid var(--bold-coral); /* ACENTO CORAL */ border-radius: 50%; animation: spin 1s linear infinite; }
+.spinner-large { width: 40px; height: 40px; border: 4px solid var(--border-soft); border-top: 4px solid var(--bold-azul); border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
