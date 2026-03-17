@@ -104,9 +104,6 @@ function closeFilterMenu() {
     populateFilterDropdown(); 
 }
 
-// =========================================================================
-// RENDERIZADO DINÁMICO DE CABECERAS (S1 vs Semana 1)
-// =========================================================================
 function renderCalendarHeaders() {
     const monthsNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; 
@@ -123,9 +120,7 @@ function renderCalendarHeaders() {
         htmlGrid += `<div class="grid-month-container" style="width: ${monthWidthPct}%;">`;
         
         for(let w = 1; w <= 4; w++) {
-            // LÓGICA INTELIGENTE: Si estamos en Appian dice "S1", si no "Semana 1"
             let weekText = currentMainTab === 'appian' ? `S${w}` : `Semana ${w}`;
-            
             htmlWeeks += `<div class="week" style="width: ${monthWidthPct / 4}%;">${weekText}</div>`;
             htmlGrid += `<div class="grid-week"></div>`;
         }
@@ -179,9 +174,6 @@ function scrollToToday() {
     wrapper.scrollTo({ left: Math.max(0, todayPosition - (wrapper.offsetWidth / 2)), behavior: 'smooth' });
 }
 
-// =========================================================================
-// TOGGLE APPIAN (Cero animaciones que compriman el texto)
-// =========================================================================
 function toggleViewMode() {
     const isMonthly = document.getElementById('viewToggle').checked;
     
@@ -239,6 +231,10 @@ function renderProjects() {
             const rawArea = project['Área'] || 'No definida';
             bar.setAttribute('data-area', areaKey);
             
+            const statusKey = normalizeText(project['Estado']);
+            // NUEVO: Le asignamos el estado a la barra para que el CSS pueda aplicarle transparencia si es Prod
+            bar.setAttribute('data-status', statusKey); 
+
             const displayLeft = Math.max(0, leftPos);
             let dateWidthPct = rightPos - leftPos;
             const displayWidthPct = Math.min(dateWidthPct - (displayLeft - leftPos), 100 - displayLeft);
@@ -255,7 +251,6 @@ function renderProjects() {
             const projName = project['Nombre del proyecto'] || 'Sin nombre';
             bar.setAttribute('title', `Proyecto: ${projName}\nÁrea: ${rawArea}\nEstado: ${project['Estado'] || 'No definido'}`);
 
-            const statusKey = normalizeText(project['Estado']);
             let iconHtml = '';
             if (statusKey === 'dev') iconHtml = `<img src="assets/dev.png" class="status-icon">`;
             else if (statusKey === 'test') iconHtml = `<img src="assets/test.png" class="status-icon">`;
@@ -322,9 +317,6 @@ function renderProjects() {
     container.style.height = `${rowEndPositions.length * rowSpacing + 80}px`;
 }
 
-// =========================================================================
-// SISTEMA DE CONTROL DE PESTAÑAS
-// =========================================================================
 function switchMainTab(tab) {
     currentMainTab = tab;
     
@@ -347,7 +339,6 @@ function switchMainTab(tab) {
     scrollArea.classList.remove('monthly-view');
     document.getElementById('toggleContainer').classList.remove('monthly-active');
 
-    // IMPORTANTE: Redibujamos las cabeceras para que cambie de "S1" a "Semana 1"
     renderCalendarHeaders();
     renderProjects();
 }
